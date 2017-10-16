@@ -1,0 +1,7 @@
+-e git+https://github.com/textX-tools/Arpeggio.git#egg=Arpeggio
+-e git+https://github.com/textX-tools/textX.git#egg=textX
+Jinja2==2.9.6
+json-rpc==1.10.3
+jsonrpcserver==3.5.1
+jsonschema==2.6.0
+websockets==3.4
