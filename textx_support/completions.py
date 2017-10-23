@@ -7,9 +7,11 @@ def completions(position):
     model = model_processor.MODEL
 
     if model.is_valid_model:
-        rule_name, model_obj = model.get_rule_name_at_position(position)
-        print(rule_name)
+        rule = model.get_rule_name_at_position(position)
+        if rule:
+            print(rule)
 
+    pass
         # mm = model.metamodel
         # txmm = model.text_metamodel
         # m = txmm.model_from_file(config.GRAMMAR_PATH)
@@ -44,19 +46,13 @@ def completions(position):
         # Dinamicaly create snippet, if not already created (keep it in dictionary)
         # Get simple match string and right side assignments
 
-    else:
-        # Parse textx error message and create completions
-        for e in model.exceptions:
-            for c in parse_error_message(e):
-                completions.add_completion(c)
+    # else:
+    #     # Parse textx error message and create completions
+    #     for e in model.exceptions:
+    #         for c in parse_error_message(e):
+    #             completions.add_completion(c)
 
-    return {
-        'isIncomplete': False,
-        'items': completions.get_completions()
-    }
-
-
-def parse_error_message(ex):
-    expected = str(ex).split('Expected ')[1].split(' at position')[0]
-    import re
-    return re.findall(r"\'(.+?)\'", expected)
+    # return {
+    #     'isIncomplete': False,
+    #     'items': completions.get_completions()
+    # }

@@ -18,7 +18,11 @@ def debounce(interval_s):
 def flatten(list_of_lists):
     return [item for lst in list_of_lists for item in lst]
 
-def line_col_to_pos(source, line, col):
+
+def line_col_to_pos(source, position):
+    line = position['line']
+    col = position['character']
+    
     lines = source.splitlines()
     offset = 0
     for l in range(0,line):
@@ -38,11 +42,3 @@ def pos_to_line_col(source, pos):
             line += 1
 
     return line, pos
-
-
-def get_ident_at_position(source, position, ident_regex=r'\w+'):
-    line = source.splitlines()[position['line']]
-    col = position['character']
-    for w_pos in re.finditer(ident_regex, line):
-        if col >= w_pos.start() and col <= w_pos.end():
-            return re.findall(ident_regex, w_pos.group(0))[0]

@@ -43,6 +43,8 @@ class Model(object):
 
     def try_parse_model(self, doc_source):
         try:
+            # Problem when changing reference to another object in model
+            self._metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
             _model = self._metamodel.model_from_str(doc_source)
             self._last_valid_model = _model
             self._model_source = doc_source
@@ -63,40 +65,18 @@ class Model(object):
             return None
 
     def get_rule_name_at_position(self, position):
-        line = position['line']
-        col = position['character']
-        pos = _utils.line_col_to_pos(self._model_source,line,col)
-        model = self.last_valid_model
 
-        # Find rule name at current position
-        rule_name, model_obj = self._find_rule_name_at_position(model, pos)
-        return rule_name, model_obj
+        offset = _utils.line_col_to_pos(self.model_source, position)
 
-    def _find_rule_name_at_position(self, model_obj, pos):
-        """
-        Depth-first model object processing.
-        """
-        metaclass = type(model_obj)
-        if type(model_obj) not in PRIMITIVE_PYTHON_TYPES:
-            for metaattr in metaclass._tx_attrs.values():
-                # If attribute is containment reference go down
-                if metaattr.ref and metaattr.cont:
-                    attr = getattr(model_obj, metaattr.name)
-                    if attr:
-                        if metaattr.mult != MULT_ONE:
-                            for obj in attr:
-                                if obj:
-                                    ret = self._find_rule_name_at_position(obj, pos)
-                                    if ret is not None:
-                                        return ret
-                        else:
-                            ret = self._find_rule_name_at_position(attr, pos)
-                            if ret is not None:
-                                return ret
+        rules_dict = self.last_valid_model._pos_rule_dict
+        
+        rule = None
+        for p in rules_dict.keys():
+            if offset > p[0] and offset < p[1]:
+                rule = rules_dict[p]
+                break
 
-        if hasattr(model_obj, '_tx_position'):
-            if model_obj._tx_position <= pos and model_obj._tx_position_end >= pos:
-                return metaclass.__name__, model_obj
+        return rule
 
 
 # Single instance
