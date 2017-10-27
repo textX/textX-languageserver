@@ -5,6 +5,7 @@ import config
 import _utils
 import itertools
 
+
 class ModelProcessor(object):
     """
     Used for parsing model and storing informations about parsing results
@@ -14,7 +15,7 @@ class ModelProcessor(object):
         metamodel(TextXMetaModel): User created metamodel.
         tx_metamodel(TextXMetaModel): TextX metamodel.
         last_valid_model(Root rule instance): Last model that is parsed without errors
-        is_valid(bool): Flag if last parsing was successful
+        is_valid_model(bool): Flag if last parsing was successful
         syntax_errors(list): List of TextXSyntaxErrors
         semantic_errors(list): List of TextXSemanticErrors
     """
@@ -23,7 +24,7 @@ class ModelProcessor(object):
         self.tx_metamodel = metamodel_from_file(config.TEXTX_GRAMMAR_PATH, debug=config.DEBUG)
         self.last_valid_model = None
         self.model_source = None
-        self.is_valid = False
+        self.is_valid_model = False
         self.syntax_errors = []
         self.semantic_errors = []
 
@@ -33,21 +34,32 @@ class ModelProcessor(object):
             self.metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
             self.model_source = model_source
             model = self.metamodel.model_from_str(model_source)
-            self._reset_to_valid_model(model)         
-            
-            print(type(self.last_valid_model))   
+            self._reset_to_valid_model(model) 
+
             return model
         except TextXSyntaxError as e:
+            self.syntax_errors = []
             self.syntax_errors.append(e)
-            self.is_valid = False
+            self.is_valid_model = False
         except TextXSemanticError as e:
+            self.semantic_errors = []
             self.semantic_errors.append(e)
-            self.is_valid = False
+            self.is_valid_model = False
 
 
     @property
     def all_errors(self):
         return itertools.chain(self.syntax_errors, self.semantic_errors)
+
+
+    @property
+    def has_syntax_errors(self):
+        return len(self.syntax_errors)
+    
+    
+    @property
+    def has_semantic_errors(self):
+        return len(self.semantic_errors)
 
 
     def get_rule_at_position(self, position):
@@ -69,10 +81,10 @@ class ModelProcessor(object):
     
     def _reset_to_valid_model(self, model):
         self.last_valid_model = model
-        self.is_valid = True
+        self.is_valid_model = True
         self.syntax_errors = []
         self.semantic_errors = []
 
 
 # Single instance
-MODEL = ModelProcessor()
+MODEL_PROCESSOR = ModelProcessor()

@@ -13,16 +13,16 @@ def definitions(doc_uri, position):
     - must be in the same file
     - Don't forget builtins
     """
-    model = model_processor.MODEL
+    model_proc = model_processor.MODEL_PROCESSOR
 
-    if model.is_valid:
+    if model_proc.is_valid_model:
 
-        source = model.model_source
+        source = model_proc.model_source
         
         offset = _utils.line_col_to_pos(source, position)
         
         # List of all references in model
-        crossref_list = model.last_valid_model._pos_crossref_list
+        crossref_list = model_proc.last_valid_model._pos_crossref_list
 
         # Find offset that is in range of ref_pos_start and ref_pos_end
         ref_rule = None

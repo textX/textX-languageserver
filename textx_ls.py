@@ -79,7 +79,7 @@ class TextXLanguageServer(LanguageServer):
 
     def m_text_document__did_open(self, textDocument=None, **_kwargs):
         self.workspace.put_document(textDocument['uri'], textDocument['text'], version=textDocument.get('version'))
-        model_processor.MODEL.parse_model(self.workspace.documents[textDocument['uri']].source)
+        model_processor.MODEL_PROCESSOR.parse_model(self.workspace.documents[textDocument['uri']].source)
         lint(textDocument['uri'], self.workspace)
 
     def m_text_document__did_change(self, contentChanges=None, textDocument=None, **_kwargs):
@@ -89,7 +89,7 @@ class TextXLanguageServer(LanguageServer):
                 change,
                 version=textDocument.get('version')
             )
-        model_processor.MODEL.parse_model(self.workspace.documents[textDocument['uri']].source)
+        model_processor.MODEL_PROCESSOR.parse_model(self.workspace.documents[textDocument['uri']].source)
         lint(textDocument['uri'], self.workspace)
 
     def m_text_document__did_save(self, textDocument=None, **_kwargs):
