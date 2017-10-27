@@ -2,55 +2,29 @@ import config
 import model_processor
 from lsp import Completions, CompletionItemKind
 
-def completions(position):
+from textx.exceptions import TextXSemanticError, TextXSyntaxError
+from textx.const import MULT_ASSIGN_ERROR, UNKNOWN_OBJ_ERROR
+
+def completions(model_source, position):
     completions = Completions()
     model = model_processor.MODEL
 
-    if model.is_valid_model:
-        rule = model.get_rule_name_at_position(position)
-        if rule:
-            print(rule)
+    try:
+        parsed_model = model.parse_model(model_source)
+        # If parsed model is valid make an error
+        # to get possible rules at current position
+        # and parse model again to get exception
 
-    pass
-        # mm = model.metamodel
-        # txmm = model.text_metamodel
-        # m = txmm.model_from_file(config.GRAMMAR_PATH)
+    except TextXSemanticError as e:
+        # If type of error is UNKNOWN_OBJ_ERROR
+        # Find all instances of expected class
+        # and offer their name attribute
+        pass
 
-        # # completions.add_completion('ins', CompletionItemKind.Snippet, 2, 'insert $1')
-        # import pprint
-        # p = pprint.pprint
-
-        # rule = None
-        # for r in m.rules:
-        #     if r.name == rule_name:
-        #         rule = r
-        #         break
-        
-        # if rule is not None:
-        #     p(rule.body.expr.__dict__)
-
-        # meta = type(model_obj)
-        # for key in meta._tx_attrs.keys():
-        #     print("---------------------------------------------------------------------------------")
-        #     p(meta._tx_attrs[key].cls.__dict__)
-        
-
-
-        # TODO
-        # Get rule in metamodel
-        # Parse metamodel with textx grammar
-        # Get information of rule and make completion list
-
-        # For each metamodel attribute, check if model already has it - if mandatory
-
-        # Dinamicaly create snippet, if not already created (keep it in dictionary)
-        # Get simple match string and right side assignments
-
-    # else:
-    #     # Parse textx error message and create completions
-    #     for e in model.exceptions:
-    #         for c in parse_error_message(e):
-    #             completions.add_completion(c)
+    except TextXSyntaxError as e:
+        # If one of possible rules are reference to other object
+        # try to fix syntax error and raise semantic error
+        pass
 
     # return {
     #     'isIncomplete': False,

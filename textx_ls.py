@@ -79,7 +79,7 @@ class TextXLanguageServer(LanguageServer):
 
     def m_text_document__did_open(self, textDocument=None, **_kwargs):
         self.workspace.put_document(textDocument['uri'], textDocument['text'], version=textDocument.get('version'))
-        model_processor.MODEL.try_parse_model(self.workspace.documents[textDocument['uri']].source)
+        model_processor.MODEL.parse_model(self.workspace.documents[textDocument['uri']].source)
         lint(textDocument['uri'], self.workspace)
 
     def m_text_document__did_change(self, contentChanges=None, textDocument=None, **_kwargs):
@@ -89,7 +89,7 @@ class TextXLanguageServer(LanguageServer):
                 change,
                 version=textDocument.get('version')
             )
-        model_processor.MODEL.try_parse_model(self.workspace.documents[textDocument['uri']].source)
+        model_processor.MODEL.parse_model(self.workspace.documents[textDocument['uri']].source)
         lint(textDocument['uri'], self.workspace)
 
     def m_text_document__did_save(self, textDocument=None, **_kwargs):
@@ -102,8 +102,8 @@ class TextXLanguageServer(LanguageServer):
         return self.code_lens(textDocument['uri'])
 
     def m_text_document__completion(self, textDocument=None, position=None, **_kwargs):
-        doc_source = self.workspace.get_document(textDocument['uri']).source
-        return completions(position)
+        model_source = self.workspace.get_document(textDocument['uri']).source
+        return completions(model_source, position)
 
     def m_text_document__definition(self, textDocument=None, position=None, **_kwargs):
         return definitions(textDocument['uri'], position)

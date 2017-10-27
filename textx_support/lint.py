@@ -12,10 +12,10 @@ from textx.exceptions import TextXError
 def lint(doc_uri, workspace):
     if doc_uri in workspace.documents:
         diagnostic = Diagnostic()
-        exceptions = model_processor.MODEL.exceptions
-        for e in exceptions:
-            if isinstance(e, TextXError):
-                message = e.message
-                diagnostic.error(e.line, e.col, message)
+        errors = model_processor.MODEL.all_errors
+        for e in errors:
+            msg = str(e)
+            if msg.index(' at position') > 0:
+                diagnostic.error(e.line, e.col, msg.split(' at position')[0])
 
         workspace.publish_diagnostics(doc_uri, diagnostic.get_diagnostics())

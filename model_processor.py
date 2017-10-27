@@ -1,75 +1,63 @@
 from textx.metamodel import metamodel_from_file
-from textx.export import metamodel_export, model_export
-from textx.exceptions import TextXError
-from textx.metamodel import TextXMetaModel
-from textx.textx import PRIMITIVE_PYTHON_TYPES
-from textx.const import MULT_ONE
+from textx.exceptions import TextXSemanticError, TextXSyntaxError
 
 import config
 import _utils
+import itertools
 
-class Model(object):
+class ModelProcessor(object):
+    """
+    Used for parsing model and storing informations about parsing results
+    and errors.
 
+    Attributes:
+        metamodel(TextXMetaModel): User created metamodel.
+        tx_metamodel(TextXMetaModel): TextX metamodel.
+        last_valid_model(Root rule instance): Last model that is parsed without errors
+        is_valid(bool): Flag if last parsing was successful
+        syntax_errors(list): List of TextXSyntaxErrors
+        semantic_errors(list): List of TextXSemanticErrors
+    """
     def __init__(self):
-        self._metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
-        self._tx_metamodel = metamodel_from_file(config.TEXTX_GRAMMAR_PATH, debug=config.DEBUG)
-        self._last_valid_model = None
-        self._model_source = None
-        self._exceptions = []
+        self.metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
+        self.tx_metamodel = metamodel_from_file(config.TEXTX_GRAMMAR_PATH, debug=config.DEBUG)
+        self.last_valid_model = None
+        self.model_source = None
+        self.is_valid = False
+        self.syntax_errors = []
+        self.semantic_errors = []
 
-    @property
-    def metamodel(self):
-        return self._metamodel
 
-    @property
-    def text_metamodel(self):
-        return self._tx_metamodel
-
-    @property
-    def last_valid_model(self):
-        return self._last_valid_model
-
-    @property
-    def model_source(self):
-        return self._model_source
-
-    @property
-    def exceptions(self):
-        return self._exceptions
-
-    @property
-    def is_valid_model(self):
-        return len(self.exceptions) == 0
-
-    def try_parse_model(self, doc_source):
+    def parse_model(self, model_source):
         try:
-            # Problem when changing reference to another object in model
-            self._metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
-            _model = self._metamodel.model_from_str(doc_source)
-            self._last_valid_model = _model
-            self._model_source = doc_source
-            self._exceptions = []
-            return _model
-        except TextXError as e:
-            msg = str(e).split(' at position')[0]
-            e.message = msg
-            # Currently TextX does not support error recovery
-            # It will show first error in model
+            self.metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
+            self.model_source = model_source
+            model = self.metamodel.model_from_str(model_source)
+            self._reset_to_valid_model(model)         
             
-            # line = e.line
-            # col = e.col
-            # if (line,col) not in [(ex.line,ex.col) for ex in self._exceptions]:
-            #     self._exceptions.append(e)
-            self._exceptions = []
-            self._exceptions.append(e)
-            return None
+            print(type(self.last_valid_model))   
+            return model
+        except TextXSyntaxError as e:
+            self.syntax_errors.append(e)
+            self.is_valid = False
+        except TextXSemanticError as e:
+            self.semantic_errors.append(e)
+            self.is_valid = False
 
-    def get_rule_name_at_position(self, position):
 
+    @property
+    def all_errors(self):
+        return itertools.chain(self.syntax_errors, self.semantic_errors)
+
+
+    def get_rule_at_position(self, position):
+        """
+        Returns rule at cursor position in model source file
+        """
         offset = _utils.line_col_to_pos(self.model_source, position)
 
         rules_dict = self.last_valid_model._pos_rule_dict
-        
+
         rule = None
         for p in rules_dict.keys():
             if offset > p[0] and offset < p[1]:
@@ -78,6 +66,13 @@ class Model(object):
 
         return rule
 
+    
+    def _reset_to_valid_model(self, model):
+        self.last_valid_model = model
+        self.is_valid = True
+        self.syntax_errors = []
+        self.semantic_errors = []
+
 
 # Single instance
-MODEL = Model()
+MODEL = ModelProcessor()
