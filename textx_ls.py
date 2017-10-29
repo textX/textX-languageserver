@@ -37,7 +37,7 @@ class TextXLanguageServer(LanguageServer):
             'documentSymbolProvider': True,
             'definitionProvider': True,
             'executeCommandProvider': {
-                'commands': []
+                'commands': ['genext']
             },
             'hoverProvider': True,
             'referencesProvider': True,
@@ -60,6 +60,7 @@ class TextXLanguageServer(LanguageServer):
         pass
 
     def execute_command(self, command, arguments):
+        print(command)
         pass
 
     def format_document(self, doc_uri):

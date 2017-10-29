@@ -16,9 +16,9 @@ def lint(doc_uri, workspace):
         for e in errors:
             msg = str(e)
             try:
-                # msg = msg.split(' at position')[0]
+                msg = msg.split(' at')[0]
                 diagnostic.error(e.line, e.col, msg)
             except:
-                pass
+                diagnostic.error(e.line, e.col, msg)
 
         workspace.publish_diagnostics(doc_uri, diagnostic.get_diagnostics())
