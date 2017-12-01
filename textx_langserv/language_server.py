@@ -1,14 +1,12 @@
 import logging
 import re
 import socketserver
-import uris
-from server import JSONRPCServer
 import os
 
 log = logging.getLogger(__name__)
 
-import config
-
+from textx_langserv import uris, config
+from textx_langserv.server import JSONRPCServer
 
 class _StreamHandlerWrapper(socketserver.StreamRequestHandler, object):
     """A wrapper class that is used to construct a custom handler class."""
@@ -39,7 +37,7 @@ def start_tcp_lang_server(bind_addr, port, handler_class):
         log.info("Serving %s on (%s, %s)", handler_class.__name__, bind_addr, port)
         server.serve_forever()
     except KeyboardInterrupt:
-        server.exit()
+        server.shutdown()
     finally:
         log.info("Shutting down")
         server.server_close()

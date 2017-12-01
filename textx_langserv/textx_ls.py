@@ -1,19 +1,13 @@
 import logging
-import lsp, _utils, uris
-from language_server import LanguageServer
-from workspace import Workspace
 
-import config
-import model_processor
+from textx_langserv import lsp, _utils, uris, config, model_processor
+from textx_langserv.language_server import LanguageServer
+from textx_langserv.workspace import Workspace
 
-from os.path import join, dirname
-
-
-from textx_support.completions import completions
-from textx_support.lint import lint
-from textx_support.hover import hover
-from textx_support.definitions import definitions
-
+from textx_langserv.textx_support.completions import completions
+from textx_langserv.textx_support.lint import lint
+from textx_langserv.textx_support.hover import hover
+from textx_langserv.textx_support.definitions import definitions
 
 
 log = logging.getLogger(__name__)
@@ -33,11 +27,12 @@ class TextXLanguageServer(LanguageServer):
                 'triggerCharacters': ['.']
             },
             'documentFormattingProvider': True,
+            # 'documentHighlightProvider': True,
             'documentRangeFormattingProvider': True,
             'documentSymbolProvider': True,
             'definitionProvider': True,
             'executeCommandProvider': {
-                'commands': ['genext']
+                'commands': ['genext','corefresh']
             },
             'hoverProvider': True,
             'referencesProvider': True,
@@ -61,7 +56,23 @@ class TextXLanguageServer(LanguageServer):
 
     def execute_command(self, command, arguments):
         print(command)
-        pass
+        # import json
+        # class TreeItem(object):
+        #     def __init__(self,name,kind):
+        #         self.name = name
+        #         self.kind = kind
+
+        #     def toJSON(self):
+        #         return json.dumps(self, default=lambda o: o.__dict__, 
+        #             sort_keys=True)
+        
+        # items = []
+        # items.append(TreeItem('x',1).toJSON())
+        # items.append(TreeItem('y',1).toJSON())
+        # items.append(TreeItem('z',1).toJSON())
+        # print(items)
+        # return items
+        return "proba"
 
     def format_document(self, doc_uri):
         pass
@@ -114,6 +125,10 @@ class TextXLanguageServer(LanguageServer):
 
     def m_text_document__document_symbol(self, textDocument=None, **_kwargs):
         return self.document_symbols(textDocument['uri'])
+    
+    # def m_text_document__document_highlight(self, textDocument=None, **_kwargs):
+    #     # return self.document_symbols(textDocument['uri'])
+    #     pass
 
     def m_text_document__formatting(self, textDocument=None, options=None, **_kwargs):
         # For now we're ignoring formatting options.

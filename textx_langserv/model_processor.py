@@ -1,10 +1,10 @@
-from textx.metamodel import metamodel_from_file
-from textx.exceptions import TextXSemanticError, TextXSyntaxError
-
-import config
-import _utils
 import itertools
 import os
+
+from textx_langserv import config, _utils
+
+from textx.metamodel import metamodel_from_file
+from textx.exceptions import TextXSemanticError, TextXSyntaxError
 
 
 class ModelProcessor(object):
@@ -103,13 +103,16 @@ class ModelProcessor(object):
         """
         Returns rule at cursor position in model source file
         """
+        if self.last_valid_model is None:
+            return
+
         offset = _utils.line_col_to_pos(self.model_source, position)
 
         rules_dict = self.last_valid_model._pos_rule_dict
-
+        
         rule = None
         for p in rules_dict.keys():
-            if offset > p[0] and offset < p[1]:
+            if p[1] > offset > p[0]:
                 rule = rules_dict[p]
                 break
 

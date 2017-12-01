@@ -1,8 +1,9 @@
-import model_processor
-import _utils
-
 import bisect
 
+from textx_langserv import model_processor, _utils
+
+
+model_proc = model_processor.MODEL_PROCESSOR
 def definitions(doc_uri, position):
     """
     If cursor position is on the reference to other instance of rule
@@ -13,8 +14,7 @@ def definitions(doc_uri, position):
     - must be in the same file
     - Don't forget builtins
     """
-    model_proc = model_processor.MODEL_PROCESSOR
-
+    
     if model_proc.is_valid_model:
 
         source = model_proc.model_source

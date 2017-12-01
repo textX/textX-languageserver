@@ -1,8 +1,5 @@
-import _utils
-import config
-import model_processor
-
-from lsp import Diagnostic
+from textx_langserv import _utils, config, model_processor
+from textx_langserv.lsp import Diagnostic
 
 from textx.metamodel import metamodel_from_file
 from textx.export import metamodel_export, model_export
