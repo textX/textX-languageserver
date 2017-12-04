@@ -1,10 +1,9 @@
 import bisect
 
-from textx_langserv import model_processor, _utils
+from utils import _utils
 
 
-model_proc = model_processor.MODEL_PROCESSOR
-def definitions(doc_uri, position):
+def definitions(doc_uri, position, tx_dsl_handler):
     """
     If cursor position is on the reference to other instance of rule
     Go to definition will place the cursor at the begining of referenced rule
@@ -15,14 +14,14 @@ def definitions(doc_uri, position):
     - Don't forget builtins
     """
     
-    if model_proc.is_valid_model:
+    if tx_dsl_handler.is_valid_model:
 
-        source = model_proc.model_source
+        source = tx_dsl_handler.model_source
         
         offset = _utils.line_col_to_pos(source, position)
         
         # List of all references in model
-        crossref_list = model_proc.last_valid_model._pos_crossref_list
+        crossref_list = tx_dsl_handler.last_valid_model._pos_crossref_list
 
         # Find offset that is in range of ref_pos_start and ref_pos_end
         ref_rule = None

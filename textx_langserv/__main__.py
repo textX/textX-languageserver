@@ -4,8 +4,8 @@ import logging
 import argparse
 import json
 
-from textx_langserv import language_server
-from textx_langserv.textx_ls import TextXLanguageServer
+from infrastructure import language_server
+from infrastructure.textx_ls import TextXLanguageServer
 
 LOG_FORMAT = "%(asctime)s UTC - %(levelname)s - %(name)s - %(message)s"
 
@@ -21,7 +21,7 @@ def add_arguments(parser):
         help="Bind to this address"
     )
     parser.add_argument(
-        "--port", type=int, default=2087,
+        "--port", type=int, default=5000,
         help="Bind to this port"
     )
 
@@ -63,6 +63,7 @@ def main():
         level = logging.DEBUG
     logging.getLogger().setLevel(level)
     if args.tcp:
+        print("STARTING")
         language_server.start_tcp_lang_server(args.host, args.port, TextXLanguageServer)
     else:
         stdin, stdout = _binary_stdio()

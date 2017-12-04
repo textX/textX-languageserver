@@ -1,20 +1,27 @@
 import logging
+import hashlib
+import os
 
-from textx_langserv import lsp, _utils, uris, config, model_processor
-from textx_langserv.language_server import LanguageServer
-from textx_langserv.workspace import Workspace
+from utils import _utils, uris
+from infrastructure import lsp
+from infrastructure.language_server import LanguageServer
+from infrastructure.workspace import Workspace
+from infrastructure.configuration import Configuration
 
-from textx_langserv.textx_support.completions import completions
-from textx_langserv.textx_support.lint import lint
-from textx_langserv.textx_support.hover import hover
-from textx_langserv.textx_support.definitions import definitions
+from capabilities.completions import completions
+from capabilities.lint import lint
+from capabilities.hover import hover
+from capabilities.definitions import definitions
 
+from infrastructure.dsl_handler import TxDslHandler
 
 log = logging.getLogger(__name__)
 
 class TextXLanguageServer(LanguageServer):
 
     workspace = None
+    configuration = None
+
 
     def capabilities(self):
         return {
@@ -42,57 +49,24 @@ class TextXLanguageServer(LanguageServer):
             'textDocumentSync': lsp.TextDocumentSyncKind.INCREMENTAL
         }
 
+
     def initialize(self, root_uri, init_opts, _process_id):
-        self.workspace = Workspace(root_uri, lang_server=self)
+        self.process_id = _process_id
+        self.root_uri = root_uri
+        self.init_opts = init_opts
 
-    def code_actions(self, doc_uri, range, context):
-        pass
+        self.workspace = Workspace(root_uri, self)
+        self.configuration = Configuration(root_uri)
+        self.tx_dsl_handler = TxDslHandler()
 
-    def code_lens(self, doc_uri):
-        pass
-
-    def document_symbols(self, doc_uri):
-        pass
-
-    def execute_command(self, command, arguments):
-        print(command)
-        # import json
-        # class TreeItem(object):
-        #     def __init__(self,name,kind):
-        #         self.name = name
-        #         self.kind = kind
-
-        #     def toJSON(self):
-        #         return json.dumps(self, default=lambda o: o.__dict__, 
-        #             sort_keys=True)
-        
-        # items = []
-        # items.append(TreeItem('x',1).toJSON())
-        # items.append(TreeItem('y',1).toJSON())
-        # items.append(TreeItem('z',1).toJSON())
-        # print(items)
-        # return items
-        return "proba"
-
-    def format_document(self, doc_uri):
-        pass
-
-    def format_range(self, doc_uri, range):
-        pass
-
-    def references(self, doc_uri, position, exclude_declaration):
-        pass
-
-    def signature_help(self, doc_uri, position):
-        pass
 
     def m_text_document__did_close(self, textDocument=None, **_kwargs):
         self.workspace.rm_document(textDocument['uri'])
 
     def m_text_document__did_open(self, textDocument=None, **_kwargs):
         self.workspace.put_document(textDocument['uri'], textDocument['text'], version=textDocument.get('version'))
-        model_processor.MODEL_PROCESSOR.parse_model(self.workspace.documents[textDocument['uri']].source)
-        lint(textDocument['uri'], self.workspace)
+        self.tx_dsl_handler.parse_model(self.workspace.documents[textDocument['uri']].source)
+        lint(textDocument['uri'], self.workspace, self.tx_dsl_handler)
 
     def m_text_document__did_change(self, contentChanges=None, textDocument=None, **_kwargs):
         for change in contentChanges:
@@ -101,58 +75,60 @@ class TextXLanguageServer(LanguageServer):
                 change,
                 version=textDocument.get('version')
             )
-        model_processor.MODEL_PROCESSOR.parse_model(self.workspace.documents[textDocument['uri']].source)
-        lint(textDocument['uri'], self.workspace)
+        self.tx_dsl_handler.parse_model(self.workspace.documents[textDocument['uri']].source)
+        lint(textDocument['uri'], self.workspace, self.tx_dsl_handler)
 
     def m_text_document__did_save(self, textDocument=None, **_kwargs):
-        lint(textDocument['uri'], self.workspace)
+        self.tx_dsl_handler.parse_model(self.workspace.documents[textDocument['uri']].source)
+        lint(textDocument['uri'], self.workspace, self.tx_dsl_handler)
 
     def m_text_document__code_action(self, textDocument=None, range=None, context=None, **_kwargs):
-        return self.code_actions(textDocument['uri'], range, context)
+        pass
 
     def m_text_document__code_lens(self, textDocument=None, **_kwargs):
-        return self.code_lens(textDocument['uri'])
+        pass
 
     def m_text_document__completion(self, textDocument=None, position=None, **_kwargs):
+        self.tx_dsl_handler.parse_model(self.workspace.documents[textDocument['uri']].source)
         model_source = self.workspace.get_document(textDocument['uri']).source
-        return completions(model_source, position)
+        return completions(model_source, position, self.tx_dsl_handler)
 
     def m_text_document__definition(self, textDocument=None, position=None, **_kwargs):
-        return definitions(textDocument['uri'], position)
+        self.tx_dsl_handler.parse_model(self.workspace.documents[textDocument['uri']].source)
+        return definitions(textDocument['uri'], position, self.tx_dsl_handler)
 
     def m_text_document__hover(self, textDocument=None, position=None, **_kwargs):
-        return hover(textDocument['uri'], position)
+        return hover(textDocument['uri'], position, self.tx_dsl_handler)
 
     def m_text_document__document_symbol(self, textDocument=None, **_kwargs):
-        return self.document_symbols(textDocument['uri'])
+        pass
     
     # def m_text_document__document_highlight(self, textDocument=None, **_kwargs):
     #     # return self.document_symbols(textDocument['uri'])
     #     pass
 
     def m_text_document__formatting(self, textDocument=None, options=None, **_kwargs):
-        # For now we're ignoring formatting options.
-        return self.format_document(textDocument['uri'])
+        pass
 
     def m_text_document__range_formatting(self, textDocument=None, range=None, options=None, **_kwargs):
-        # Again, we'll ignore formatting options for now.
-        return self.format_range(textDocument['uri'], range)
+        pass
 
     def m_text_document__references(self, textDocument=None, position=None, context=None, **_kwargs):
         exclude_declaration = not context['includeDeclaration']
-        return self.references(textDocument['uri'], position, exclude_declaration)
+        pass
 
     def m_text_document__signature_help(self, textDocument=None, position=None, **_kwargs):
-        return self.signature_help(textDocument['uri'], position)
+        pass
 
     def m_workspace__did_change_configuration(self, settings=None):
         for doc_uri in self.workspace.documents:
-            lint(doc_uri, self.workspace)
+            lint(textDocument['uri'], self.workspace, self.tx_dsl_handler)
 
     def m_workspace__did_change_watched_files(self, **_kwargs):
         # Externally changed files may result in changed diagnostics
         for doc_uri in self.workspace.documents:
-            lint(doc_uri, self.workspace)
+            lint(textDocument['uri'], self.workspace, self.tx_dsl_handler)
 
     def m_workspace__execute_command(self, command=None, arguments=None):
-        return self.execute_command(command, arguments)
+        print(command)
+        return "test"

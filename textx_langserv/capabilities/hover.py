@@ -1,8 +1,5 @@
-from textx_langserv import config, model_processor
 
-
-model_proc = model_processor.MODEL_PROCESSOR
-def hover(doc_uri, position):
+def hover(doc_uri, position, tx_dsl_handler):
 
     # rule = model_proc.get_rule_at_position(position)
     # if rule is None:

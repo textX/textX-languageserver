@@ -1,5 +1,5 @@
-from textx_langserv import _utils, config, model_processor
-from textx_langserv.lsp import Completions, CompletionItemKind
+from utils import _utils
+from infrastructure.lsp import Completions, CompletionItemKind
 
 from textx.exceptions import TextXSemanticError, TextXSyntaxError
 from textx.const import MULT_ASSIGN_ERROR, UNKNOWN_OBJ_ERROR
@@ -22,20 +22,19 @@ MAX_RECURSION_CALLS = 20
 EXCLUDE_FROM_COMPLETIONS = ['Not', 'EOF']
 
 
-model_proc = model_processor.MODEL_PROCESSOR
-def completions(model_source, position):
+def completions(model_source, position, tx_dsl_handler):
     """
     Returns completion items at current position.
     If model is valid, FAKE_SYN_CHARS are added to make parsing errors.
     """
 
     comps = Completions()
-    last_valid_model = model_proc.last_valid_model
+    last_valid_model = tx_dsl_handler.last_valid_model
 
     offset = _utils.line_col_to_pos(model_source, position)
 
     # If model is valid, create fake model
-    if model_proc.is_valid_model:
+    if tx_dsl_handler.is_valid_model:
         model_source = model_source[:offset] + FAKE_SYN_CHARS + model_source[offset:]
 
     def _get_completions(model_source, offset):
@@ -51,7 +50,7 @@ def completions(model_source, position):
         _get_completions.rcounter += 1
 
         # Parse fake model and get errors
-        syntax_errors, semantic_errors = model_proc.fake_parse_model(model_source)
+        syntax_errors, semantic_errors = tx_dsl_handler.fake_parse_model(model_source)
 
         # Remove fake string which is added to make errors
         model_source = model_source.replace(FAKE_SYN_CHARS,'')

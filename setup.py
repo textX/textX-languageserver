@@ -27,7 +27,7 @@ setup(
     license=LICENSE,
     url=URL,
     download_url=DOWNLOAD_URL,
-    packages=["textx_langserv", "textx_langserv.textx_support"],
+    packages=["..."],
     install_requires=[
         'funcsigs==1.0.2',
         'Jinja2==2.9.6',

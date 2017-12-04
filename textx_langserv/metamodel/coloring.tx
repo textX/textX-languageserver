@@ -1,0 +1,198 @@
+Program:
+	configuration=Configuration? rules*=Rule
+;
+
+Rule:
+	rules=Rules | keywords=Keywords | regular_expressions = RegularExpressions
+;
+
+Configuration:
+	'configuration' '=' '{' configuration_commands *= ConfigurationCommand '}'
+;
+
+ConfigurationCommand:
+	default=Default | coment=Coment
+;
+	
+Default:
+	'default' ':' default_options += DefaultOption
+;
+
+DefaultOption:
+	default_keyword_option = DefaultKeyword | default_operation = DefaultOperation
+;
+
+DefaultKeyword:
+	'keyword' '->' type=Type ';'
+;
+
+DefaultOperation:
+	'operation' '->' type=Type ';'
+;
+
+Coment:
+	'comment' ':' comment_options+=CommentOption
+;
+
+CommentOption:
+	line=Line | block=Block
+;
+
+Line:
+	'line' ':' id=STRING ';'
+;
+
+Block:
+	'block' ':' 'start' ':' start=STRING ';' 'end' ':' end=STRING ';'
+;
+
+Rules:
+	'rules' '=' '{' rule_options*=RuleOption '}'
+;
+
+RuleOption:
+	rule_keyword=RuleKeyword | rule_operation=RuleOperation
+;
+
+RuleKeyword:
+	'keyword' ':' rule_lists+=RuleList
+;
+
+RuleOperation:
+	'operation' ':' rule_lists+=RuleList
+;
+
+RuleList:
+	elements+=ID[','] '->' type=Type ';'
+;
+
+Keywords:
+	'keywords' '=' '{' keword_list*=KeywordList '}'
+;
+
+KeywordList:
+	words*=STRING[','] '->' type=Type ';'
+;
+
+RegularExpressions:
+	'regular' 'expressions' '=' '{' regular_expression_list *= RegularExpressionList '}'
+;
+
+RegularExpressionList:
+	expression*=STRING[','] '->' type=Type ';'
+;
+
+Type:
+	"comment.block.documentation" |
+	"comment.line.double-dash" |
+	"comment.line.double-slash" |
+	"comment.line.number-sign" |
+	"comment.line.percentage" |
+	"comment.block" |
+	"comment.line" |
+	"comment" |
+	"constant.character.escape" |
+	"constant.sha.git-rebase" |
+	"constant.language" |
+	"constant.numeric" |
+	"constant.other" |
+	"constant.regexp" |
+	"constant.rgb-value" |
+	"constant.character" |
+	"constant" |
+	"emphasis" |
+	"entity.name.class" |
+	"entity.name.function" |
+	"entity.name.method" |
+	"entity.name.section" |
+	"entity.name.selector" |
+	"entity.name.tag" |
+	"entity.name.type" |
+	"entity.other.attribute-name" |
+	"entity.other.inherited-class" |
+	"entity.other" |
+	"entity.name" |
+	"entity" |
+	"header" |
+	"invalid.deprecated" |
+	"invalid.illegal" |
+	"invalid" |
+	"keyword.other.unit" |
+	"keyword.control.less" |
+	"keyword.operator.new" |
+	"keyword.operator" |
+	"keyword.control" |
+	"keyword.other" |
+	"keyword" |
+	"markup.punctuation.list.beginning" |
+	"markup.punctuation.quote.beginning" |
+	"markup.list.numbered" |
+	"markup.inline.raw" |
+	"markup.list.unnumbered" |
+	"markup.underline.link" |
+	"markup.bold" |
+	"markup.changed" |
+	"markup.deleted" |
+	"markup.heading" |
+	"markup.inserted" |
+	"markup.italic" |
+	"markup.list" |
+	"markup.other" |
+	"markup.quote" |
+	"markup.raw" |
+	"markup.underline" |
+	"markup" |
+	"meta.structure.dictionary.key.python" |
+	"meta.parameter.type.variable" |
+	"meta.preprocessor.numeric" |
+	"meta.preprocessor.string" |
+	"meta.type.annotation" |
+	"meta.type.name" |
+	"meta.cast" |
+	"meta.preprocessor" |
+	"meta.return-type" |
+	"meta.selector" |
+	"meta.tag" |
+	"metatag.php" |
+	"meta" |
+	"storage.modifier.import.java" |
+	"storage.modifier.package.java" |
+	"storage.type.cs" |
+	"storage.type.java" |
+	"storage.modifier" |
+	"storage.type" |
+	"storage" |
+	"string.quoted.double" |
+	"string.quoted.other" |
+	"string.quoted.single" |
+	"string.quoted.triple" |
+	"string.html" |
+	"string.interpolated" |
+	"string.jade" |
+	"string.other" |
+	"string.quoted" |
+	"string.regexp" |
+	"string.unquoted" |
+	"string.xml" |
+	"string.yaml" |
+	"string" |
+	"strong" |
+	"support.type.property-name.css" |
+	"support.type.property-name.less" |
+	"support.type.property-name.scss" |
+	"support.function.git-rebase" |
+	"support.type.property-name" |
+	"support.class" |
+	"support.constant" |
+	"support.function" |
+	"support.other" |
+	"support.property-value" |
+	"support.type" |
+	"support.variable" |
+	"support" |
+	"variable.language" |
+	"variable.name" |
+	"variable.other" |
+	"variable.parameter" |
+	"variable"
+;

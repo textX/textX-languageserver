@@ -1,15 +1,17 @@
-from textx_langserv import _utils, config, model_processor
-from textx_langserv.lsp import Diagnostic
+from utils import _utils
+from infrastructure.lsp import Diagnostic
 
 from textx.metamodel import metamodel_from_file
 from textx.export import metamodel_export, model_export
 from textx.exceptions import TextXError
 
-@_utils.debounce(config.LINT_DEBOUNCE_S)
-def lint(doc_uri, workspace):
+LINT_DEBOUNCE_S = 0.5
+
+@_utils.debounce(LINT_DEBOUNCE_S)
+def lint(doc_uri, workspace, tx_dsl_handler):
     if doc_uri in workspace.documents:
         diagnostic = Diagnostic()
-        errors = model_processor.MODEL_PROCESSOR.all_errors
+        errors = tx_dsl_handler.all_errors
         for e in errors:
             msg = str(e)
             try:

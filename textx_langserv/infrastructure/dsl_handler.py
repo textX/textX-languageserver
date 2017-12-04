@@ -1,50 +1,37 @@
 import itertools
 import os
 
-from textx_langserv import config, _utils
+from os.path import dirname, join
+
+from utils import _utils
 
 from textx.metamodel import metamodel_from_file
 from textx.exceptions import TextXSemanticError, TextXSyntaxError
 
+this_folder = dirname(__file__)
 
-class ModelProcessor(object):
-    """
-    Used for parsing model and storing informations about parsing results
-    and errors.
-
-    Attributes:
-        metamodel(TextXMetaModel): User created metamodel.
-        tx_metamodel(TextXMetaModel): TextX metamodel.
-        _metamodel_mtime(): Last modification of grammar file in seconds
-        last_valid_model(Root rule instance): Last model that is parsed without errors
-        is_valid_model(bool): Flag if last parsing was successful
-        syntax_errors(list): List of TextXSyntaxErrors
-        semantic_errors(list): List of TextXSemanticErrors
-    """
+class TxDslHandler(object):
+   
     def __init__(self):
-        try:
-            self.metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
-            self._metamodel_mtime = os.path.getmtime(config.GRAMMAR_PATH)
-            self.tx_metamodel = metamodel_from_file(config.TEXTX_GRAMMAR_PATH, debug=config.DEBUG)
-        except OSError as e:
-            pass
-
+        self.metamodel = None
         self.last_valid_model = None
         self.model_source = None
         self.is_valid_model = False
         self.syntax_errors = []
         self.semantic_errors = []
+    
+
+    def set_metamodel(self, metamodel):
+        self.metamodel = metamodel
+        self._reset_to_valid_model(None)
 
 
     def parse_model(self, model_source):
         try:
-            self._metamodel_change_check()
-            
-            self.metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
             self.model_source = model_source
             model = self.metamodel.model_from_str(model_source)
             self._reset_to_valid_model(model) 
-
+            
             return model
         except TextXSyntaxError as e:
             self.syntax_errors = []
@@ -72,9 +59,6 @@ class ModelProcessor(object):
         sem_errs = []
 
         try:
-            self._metamodel_change_check()
-            
-            self.metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
             self.metamodel.model_from_str(fake_model_source)
         except TextXSyntaxError as e:
             syn_errs.append(e)
@@ -132,12 +116,10 @@ class ModelProcessor(object):
         Consider using 'watchdog' library.
         """
         try:
-            new_mtime = os.path.getmtime(config.GRAMMAR_PATH)
+            gram = 'C:\\Users\\Daniel\\Desktop\\TEXTX-LANGUAGESERVER\\textx-languageserver\\examples\\SimpleLang\\eg1_grammar.tx'
+            new_mtime = os.path.getmtime(gram)
             if new_mtime != self._metamodel_mtime:
                 self._metamodel_mtime = new_mtime
-                self.metamodel = metamodel_from_file(config.GRAMMAR_PATH, debug=config.DEBUG)
+                self.metamodel = metamodel_from_file(gram, debug=False)
         except OSError as e:
             pass
-
-# Single instance
-MODEL_PROCESSOR = ModelProcessor()

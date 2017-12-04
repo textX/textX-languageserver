@@ -5,8 +5,8 @@ import os
 
 log = logging.getLogger(__name__)
 
-from textx_langserv import uris, config
-from textx_langserv.server import JSONRPCServer
+from utils import uris
+from infrastructure.server import JSONRPCServer
 
 class _StreamHandlerWrapper(socketserver.StreamRequestHandler, object):
     """A wrapper class that is used to construct a custom handler class."""
@@ -33,6 +33,7 @@ def start_tcp_lang_server(bind_addr, port, handler_class):
     )
 
     server = socketserver.ThreadingTCPServer((bind_addr, port), wrapper_class)
+
     try:
         log.info("Serving %s on (%s, %s)", handler_class.__name__, bind_addr, port)
         server.serve_forever()
@@ -45,7 +46,7 @@ def start_tcp_lang_server(bind_addr, port, handler_class):
 
 def start_io_lang_server(rfile, wfile, handler_class):
     if not issubclass(handler_class, JSONRPCServer):
-        raise ValueError("Handler class must be a subclass of LanguagJSONRPCServereServer")
+        raise ValueError("Handler class must be a subclass of LanguageJSONRPCServereServer")
     log.info("Starting %s IO language server", handler_class.__name__)
     server = handler_class(rfile, wfile)
     server.handle()
@@ -63,12 +64,21 @@ class MethodJSONRPCServer(JSONRPCServer):
 
         def wrapped(*args, **kwargs):
             try:
-                # this is the one way to filter documents
-                # other way is to specify language and the activation-event for that language in CLIENT
+                # Filter files
                 if 'textDocument' in kwargs.keys():
-                    _, ext = os.path.splitext(kwargs['textDocument']['uri'])
-                    if ext not in config.LANGUAGE_EXTENSIONS:
+                    name, ext = os.path.splitext(os.path.basename(kwargs['textDocument']['uri']))
+                    # If file does not have name (.txconfig)
+                    if not ext:
+                        ext = name
+                    dsl_extensions = self.configuration.get_all_extensions()
+                    if ext not in dsl_extensions:
                         return
+                    # Get metamodel for dsl
+                    metamodel = self.configuration.get_metamodel_by_dsl_ext(ext)
+                    if not metamodel:
+                        return
+                    self.tx_dsl_handler.set_metamodel(metamodel)
+
                 return func(*args, **kwargs)
             except:  # pylint: disable=bare-except
                 log.exception("CAUGHT")
@@ -119,7 +129,7 @@ class LanguageServer(MethodJSONRPCServer):
         self.shutdown()
 
     def m_exit(self, **_kwargs):
-        self.exit()
+        self.shutdown()
 
 
 _RE_FIRST_CAP = re.compile('(.)([A-Z][a-z]+)')

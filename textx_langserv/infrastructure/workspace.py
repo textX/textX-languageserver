@@ -4,7 +4,8 @@ import os
 import re
 import sys
 
-from textx_langserv import lsp, uris
+from infrastructure import lsp
+from utils import uris
 
 log = logging.getLogger(__name__)
 
