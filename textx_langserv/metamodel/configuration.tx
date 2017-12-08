@@ -7,7 +7,7 @@ Rule:
 ;
 
 RuleName:
-	'general' | 'path' | 'command' | 'python'
+	'general' | 'path' | 'command'
 ;
 
 Option:

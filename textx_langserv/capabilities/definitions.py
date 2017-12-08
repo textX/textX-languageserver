@@ -13,7 +13,6 @@ def definitions(doc_uri, position, tx_dsl_handler):
     - must be in the same file
     - Don't forget builtins
     """
-    
     if tx_dsl_handler.is_valid_model:
 
         source = tx_dsl_handler.model_source
@@ -43,9 +42,6 @@ def definitions(doc_uri, position, tx_dsl_handler):
                 'end': {'line': end_line, 'character': end_col}
             }
         }]
-
-
-        import bisect
 
 
 def find(offset, sorted_list):

@@ -1,0 +1,23 @@
+Program:
+	rules*=Rule
+;
+
+Rule:
+	name=ID '{' choices=Choice '}'
+;
+
+Choice:
+	(label=Label | icon=Icon)*
+;
+
+Label:
+	'label' '=' names+=Name['+']
+;
+
+Name:
+	id=ID | string=STRING
+;
+
+Icon:
+	'icon' '=' path=STRING
+;

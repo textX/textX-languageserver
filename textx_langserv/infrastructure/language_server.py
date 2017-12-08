@@ -67,7 +67,7 @@ class MethodJSONRPCServer(JSONRPCServer):
                 # Filter files
                 if 'textDocument' in kwargs.keys():
                     name, ext = os.path.splitext(os.path.basename(kwargs['textDocument']['uri']))
-                    # If file does not have name (.txconfig)
+                    # If file does not have name (e.g. -> .txconfig)
                     if not ext:
                         ext = name
                     dsl_extensions = self.configuration.get_all_extensions()
@@ -78,7 +78,6 @@ class MethodJSONRPCServer(JSONRPCServer):
                     if not metamodel:
                         return
                     self.tx_dsl_handler.set_metamodel(metamodel)
-
                 return func(*args, **kwargs)
             except:  # pylint: disable=bare-except
                 log.exception("CAUGHT")

@@ -12,6 +12,7 @@ from capabilities.completions import completions
 from capabilities.lint import lint
 from capabilities.hover import hover
 from capabilities.definitions import definitions
+from capabilities.find_references import find_all_references
 
 from infrastructure.dsl_handler import TxDslHandler
 
@@ -39,7 +40,7 @@ class TextXLanguageServer(LanguageServer):
             'documentSymbolProvider': True,
             'definitionProvider': True,
             'executeCommandProvider': {
-                'commands': ['genext','corefresh']
+                'commands': ['genext','corefresh', 'test']
             },
             'hoverProvider': True,
             'referencesProvider': True,
@@ -56,8 +57,8 @@ class TextXLanguageServer(LanguageServer):
         self.init_opts = init_opts
 
         self.workspace = Workspace(root_uri, self)
-        self.configuration = Configuration(root_uri)
         self.tx_dsl_handler = TxDslHandler()
+        self.configuration = Configuration(root_uri)
 
 
     def m_text_document__did_close(self, textDocument=None, **_kwargs):
@@ -114,21 +115,26 @@ class TextXLanguageServer(LanguageServer):
         pass
 
     def m_text_document__references(self, textDocument=None, position=None, context=None, **_kwargs):
-        exclude_declaration = not context['includeDeclaration']
         pass
+        
 
     def m_text_document__signature_help(self, textDocument=None, position=None, **_kwargs):
         pass
 
     def m_workspace__did_change_configuration(self, settings=None):
         for doc_uri in self.workspace.documents:
-            lint(textDocument['uri'], self.workspace, self.tx_dsl_handler)
+            lint(doc_uri, self.workspace, self.tx_dsl_handler)
 
     def m_workspace__did_change_watched_files(self, **_kwargs):
+        for change in _kwargs['changes']:
+            if uris.to_fs_path(change['uri']) == self.configuration.txconfig_uri:
+                self.configuration.update_configuration()
+                self.workspace.show_message("You have to reopen your tabs or restart vs code.")
         # Externally changed files may result in changed diagnostics
         for doc_uri in self.workspace.documents:
-            lint(textDocument['uri'], self.workspace, self.tx_dsl_handler)
+            lint(doc_uri, self.workspace, self.tx_dsl_handler)
+        
 
     def m_workspace__execute_command(self, command=None, arguments=None):
         print(command)
-        return "test"
+        #return [1,2,3,4,5]

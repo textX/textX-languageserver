@@ -14,18 +14,31 @@ this_folder = dirname(__file__)
 class Configuration(object):
 
     def __init__(self, root_uri):
-        tx_mm = metamodel_from_file(join(this_folder,'../metamodel/textx.tx'))
-        tx_config_mm = metamodel_from_file(join(this_folder,'../metamodel/configuration.tx'))
-        tx_coloring_mm = metamodel_from_file(join(this_folder,'../metamodel/coloring.tx'))
-        
-        self.config_model = tx_config_mm.model_from_file(join(uris.to_fs_path(root_uri),'.txconfig'))
+        self._tx_mm = metamodel_from_file(join(this_folder,'../metamodel/textx.tx'))
+        self._tx_config_mm = metamodel_from_file(join(this_folder,'../metamodel/configuration.tx'))
+        self._tx_coloring_mm = metamodel_from_file(join(this_folder,'../metamodel/coloring.tx'))
+        self._tx_outline_mm = metamodel_from_file(join(this_folder,'../metamodel/outline.tx'))
+
+        self.root_uri = root_uri
+        self.txconfig_uri = join(uris.to_fs_path(root_uri),'.txconfig')
+        self.config_model = None
 
         self.dsls = {
-            '_tx_txlang': (['.tx'], tx_mm),
-            '_tx_configlang': (['.txconfig'], tx_config_mm),
-            '_tx_coloringlang': (['.clr'], tx_coloring_mm),
-            self.language_name: (self.language_extensions, metamodel_from_file(self.grammar_path))
+            '_tx_txlang': (['.tx'], self._tx_mm),
+            '_tx_configlang': (['.txconfig'], self._tx_config_mm),
+            '_tx_coloringlang': (['.txcl'], self._tx_coloring_mm),
+            '_tx_outlinelang': (['.txol'], self._tx_outline_mm),
         }
+
+        self.update_configuration()
+
+    
+    def update_configuration(self):
+        try:
+            self.config_model = self._tx_config_mm.model_from_file(self.txconfig_uri)
+            self.dsls['_tx_customlang'] = (self.language_extensions, metamodel_from_file(self.grammar_path))
+        except:
+            pass
 
 
     def get_metamodel_by_dsl_name(self, dsl_name):
@@ -90,10 +103,6 @@ class Configuration(object):
     @property
     def project_path(self):
         return join(self.genereting_path, self.language_name)
-
-    @property
-    def python_interpreter(self):
-        return self.getValue('python', 'interpreter')
 
     def getValue(self, rule, option):
         for rule_item in self.config_model.rules:
