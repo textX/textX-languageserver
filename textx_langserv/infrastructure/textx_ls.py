@@ -115,7 +115,8 @@ class TextXLanguageServer(LanguageServer):
         pass
 
     def m_text_document__references(self, textDocument=None, position=None, context=None, **_kwargs):
-        pass
+        self.tx_dsl_handler.parse_model(self.workspace.documents[textDocument['uri']].source)
+        return find_all_references(textDocument['uri'], position, context, self.tx_dsl_handler)
         
 
     def m_text_document__signature_help(self, textDocument=None, position=None, **_kwargs):
