@@ -19,12 +19,10 @@ class TxDslHandler(object):
         self.is_valid_model = False
         self.syntax_errors = []
         self.semantic_errors = []
-    
+
 
     def set_metamodel(self, metamodel):
         self.metamodel = metamodel
-        self._reset_to_valid_model(None)
-
 
     def parse_model(self, model_source):
         try:
@@ -102,24 +100,18 @@ class TxDslHandler(object):
 
         return rule
 
+
+    def get_all_rules(self):
+        """
+        Concatenate builtins with rule list
+        """
+        builtins = list(self.metamodel.builtins.values())
+        from_model = list(self.last_valid_model._pos_rule_dict.values())
+        return from_model + builtins
+
     
     def _reset_to_valid_model(self, model):
         self.last_valid_model = model
         self.is_valid_model = True
         self.syntax_errors = []
         self.semantic_errors = []
-
-
-    def _metamodel_change_check(self):
-        """
-        Checking for metamodel changes.
-        Consider using 'watchdog' library.
-        """
-        try:
-            gram = 'C:\\Users\\Daniel\\Desktop\\TEXTX-LANGUAGESERVER\\textx-languageserver\\examples\\SimpleLang\\eg1_grammar.tx'
-            new_mtime = os.path.getmtime(gram)
-            if new_mtime != self._metamodel_mtime:
-                self._metamodel_mtime = new_mtime
-                self.metamodel = metamodel_from_file(gram, debug=False)
-        except OSError as e:
-            pass

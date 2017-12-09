@@ -73,8 +73,10 @@ def completions(model_source, position, tx_dsl_handler):
                     except:
                         cls_names.append(e.expected_obj_cls.__name__)
 
+                    
+
                     return [obj.name
-                        for obj in last_valid_model._pos_rule_dict.values()
+                        for obj in tx_dsl_handler.get_all_rules()
                         if hasattr(obj,'name') and type(obj).__name__ in cls_names]
 
                 elif e.err_type == MULT_ASSIGN_ERROR:
