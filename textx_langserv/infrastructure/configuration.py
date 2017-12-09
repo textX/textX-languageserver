@@ -6,6 +6,7 @@ from utils._utils import flatten
 from os.path import join, dirname
 
 import glob
+import os
 
 this_folder = dirname(__file__)
 
@@ -34,11 +35,23 @@ class Configuration(object):
 
     
     def update_configuration(self):
-        try:
-            self.config_model = self._tx_config_mm.model_from_file(self.txconfig_uri)
-            self.dsls['_tx_customlang'] = (self.language_extensions, metamodel_from_file(self.grammar_path))
-        except:
-            pass
+        # ADD TRY EXCEPT
+        self.config_model = self._tx_config_mm.model_from_file(self.txconfig_uri)
+
+        def get_func_from_module_path(path, module_name):
+            import imp
+            func_name = path[2:].split(':')[1]
+            path_name = path.replace(':{}'.format(func_name),'')
+            module = imp.load_source(module_name, path_name)
+            return getattr(module, func_name)
+
+        classes = get_func_from_module_path(self.mm_classes, "_custom_classes")()
+        builtins = get_func_from_module_path(self.mm_builtins, "_custom_builtins")()
+
+        self.dsls['_tx_customlang'] = (self.language_extensions,
+                                    metamodel_from_file(self.grammar_path,
+                                                        classes=classes,
+                                                        builtins=builtins))
 
 
     def get_metamodel_by_dsl_name(self, dsl_name):
@@ -104,10 +117,33 @@ class Configuration(object):
     def project_path(self):
         return join(self.genereting_path, self.language_name)
 
+    @property
+    def mm_classes(self):
+        return self.getValue('path', 'classes')
+
+    @property
+    def mm_builtins(self):
+        return self.getValue('path', 'builtins')
+
     def getValue(self, rule, option):
+        ret_val = None
         for rule_item in self.config_model.rules:
             if rule_item.name == rule:
                 for option_item in rule_item.options:
                     if option_item.name == option:
-                        return option_item.value
-        return None
+                        ret_val = option_item.value
+        if ret_val and rule == 'path':
+            return to_fs_path(self.root_uri, ret_val)
+
+        return ret_val
+
+
+def to_fs_path(root_uri, path):
+    """
+    Handle relative and absolute paths
+    """
+    is_abs = os.path.isabs(path)
+    if is_abs:
+        return path
+    else:
+        return join(uris.to_fs_path(root_uri), path)

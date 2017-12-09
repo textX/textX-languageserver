@@ -13,9 +13,11 @@ def find_all_references(doc_uri, position, context, tx_dsl_handler):
         # List of all references in model
         crossref_list = tx_dsl_handler.last_valid_model._pos_crossref_list
 
+        rule = tx_dsl_handler.get_rule_at_position(position)
+    
         all_references = []
         for ref_rule in crossref_list:
-            if ref_rule.def_pos_end > offset > ref_rule.def_pos_start:
+            if ref_rule.def_pos_start == rule._tx_position and ref_rule.def_pos_end == rule._tx_position_end:
                 st_line, st_col = _utils.pos_to_line_col(source, ref_rule.ref_pos_start)
                 end_line, end_col = _utils.pos_to_line_col(source, ref_rule.ref_pos_end)
                 all_references.append((
