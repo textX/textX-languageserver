@@ -8,36 +8,53 @@ from os.path import join, dirname
 import glob
 import os
 
+from functools import partial
+
+
 this_folder = dirname(__file__)
-
-
 
 class Configuration(object):
 
-    def __init__(self, root_uri):
-        self._tx_mm = metamodel_from_file(join(this_folder,'../metamodel/textx.tx'))
-        self._tx_config_mm = metamodel_from_file(join(this_folder,'../metamodel/configuration.tx'))
-        self._tx_coloring_mm = metamodel_from_file(join(this_folder,'../metamodel/coloring.tx'))
-        self._tx_outline_mm = metamodel_from_file(join(this_folder,'../metamodel/outline.tx'))
-
+    def __init__(self, root_uri, workspace):
         self.root_uri = root_uri
+        self.workspace = workspace
         self.txconfig_uri = join(uris.to_fs_path(root_uri),'.txconfig')
         self.config_model = None
 
-        self.dsls = {
-            '_tx_txlang': (['.tx'], self._tx_mm),
-            '_tx_configlang': (['.txconfig'], self._tx_config_mm),
-            '_tx_coloringlang': (['.txcl'], self._tx_coloring_mm),
-            '_tx_outlinelang': (['.txol'], self._tx_outline_mm),
-        }
+        self._loader = lambda path, classes=[], builtins={}: \
+                        metamodel_from_file(join(this_folder,'../metamodel', path),
+                                            classes=classes,
+                                            builtins=builtins)
 
-        self.update_configuration()
+        self.dsls_info = [
+            (['.tx'],       partial(self._loader,'textx.tx')),
+            (['.txconfig'], partial(self._loader,'configuration.tx')),
+            (['.txcl'],     partial(self._loader,'coloring.tx')),
+            (['.txol'],     partial(self._loader,'outline.tx'))
+        ]
+
+        self.load_configuration()
+
+
+    def _get_mm_loader_by_ext(self, ext):
+        for dsl_exts, mm_loader in self.dsls_info:
+            if ext in dsl_exts:
+                return mm_loader
+
+
+    def get_mm_by_ext(self, ext):
+        return self._get_mm_loader_by_ext(ext)()
 
     
-    def update_configuration(self):
-        # ADD TRY EXCEPT
-        self.config_model = self._tx_config_mm.model_from_file(self.txconfig_uri)
+    def load_configuration(self):
+        try:
+            self.config_model = self.get_mm_by_ext('.txconfig').model_from_file(self.txconfig_uri)
+            self.load_metamodel()
+        except:
+            self.workspace.show_message("Error in .txconfig file.")
+    
 
+    def load_metamodel(self):
         def get_func_from_module_path(path, module_name):
             import imp
             func_name = path[2:].split(':')[1]
@@ -48,29 +65,14 @@ class Configuration(object):
         classes = get_func_from_module_path(self.mm_classes, "_custom_classes")()
         builtins = get_func_from_module_path(self.mm_builtins, "_custom_builtins")()
 
-        self.dsls['_tx_customlang'] = (self.language_extensions,
-                                    metamodel_from_file(self.grammar_path,
-                                                        classes=classes,
-                                                        builtins=builtins))
+        self.dsls_info.append((self.language_extensions, partial(self._loader,
+                                                                self.grammar_path,
+                                                                classes,
+                                                                builtins)))
 
-
-    def get_metamodel_by_dsl_name(self, dsl_name):
-        try:
-            _, mm = self.dsls[dsl_name]
-            return mm
-        except:
-            return None
-
-
-    def get_metamodel_by_dsl_ext(self, dsl_ext):
-        for dsl in self.dsls.values():
-            exts, mm = dsl
-            if dsl_ext in exts:
-                return mm
-
-
+ 
     def get_all_extensions(self):
-        return flatten([ext for ext, _ in self.dsls.values()])
+        return flatten([ext for ext, _ in self.dsls_info])
         
 
     @property

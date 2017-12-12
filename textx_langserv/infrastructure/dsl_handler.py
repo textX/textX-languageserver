@@ -8,37 +8,36 @@ from utils import _utils
 from textx.metamodel import metamodel_from_file
 from textx.exceptions import TextXSemanticError, TextXSyntaxError
 
-this_folder = dirname(__file__)
 
 class TxDslHandler(object):
    
-    def __init__(self):
-        self.metamodel = None
+    def __init__(self, configuration, dsl_extension):
+        self.configuration = configuration
+        self.dsl_extension = dsl_extension
         self.last_valid_model = None
         self.model_source = None
         self.is_valid_model = False
         self.syntax_errors = []
         self.semantic_errors = []
-
-
-    def set_metamodel(self, metamodel):
-        self.metamodel = metamodel
+        
 
     def parse_model(self, model_source):
+        # Reset errors
+        self.syntax_errors = []
+        self.semantic_errors = []
+
+        # Try to parse
         try:
             self.model_source = model_source
-            model = self.metamodel.model_from_str(model_source)
-            self._reset_to_valid_model(model) 
+            model = self.configuration.get_mm_by_ext(self.dsl_extension).model_from_str(model_source)
+            self.last_valid_model = model
+            self.is_valid_model = True
             
             return model
-        except TextXSyntaxError as e:
-            self.syntax_errors = []
-            self.semantic_errors = []
+        except TextXSyntaxError as e:  
             self.syntax_errors.append(e)
             self.is_valid_model = False
         except TextXSemanticError as e:
-            self.syntax_errors = []            
-            self.semantic_errors = []
             self.semantic_errors.append(e)
             self.is_valid_model = False
 
@@ -57,7 +56,7 @@ class TxDslHandler(object):
         sem_errs = []
 
         try:
-            self.metamodel.model_from_str(fake_model_source)
+            self.configuration.get_mm_by_ext(self.dsl_extension).model_from_str(fake_model_source)
         except TextXSyntaxError as e:
             syn_errs.append(e)
         except TextXSemanticError as e:
@@ -105,13 +104,6 @@ class TxDslHandler(object):
         """
         Concatenate builtins with rule list
         """
-        builtins = list(self.metamodel.builtins.values())
+        builtins = list(self.configuration.get_mm_by_ext(self.dsl_extension).builtins.values())
         from_model = list(self.last_valid_model._pos_rule_dict.values())
         return from_model + builtins
-
-    
-    def _reset_to_valid_model(self, model):
-        self.last_valid_model = model
-        self.is_valid_model = True
-        self.syntax_errors = []
-        self.semantic_errors = []
