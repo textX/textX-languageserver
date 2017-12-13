@@ -1,24 +1,24 @@
-from textx.metamodel import metamodel_from_file
-
-from utils import constants, uris
-from utils._utils import flatten
-
-from os.path import join, dirname
-
-import glob
 import os
 
 from functools import partial
+from os.path import join, dirname
+
+from textx.metamodel import metamodel_from_file
+
+from utils import uris
+from utils._utils import flatten
+from utils.constants import TX_TX_EXTENSION, TX_CONFIG_EXTENSION, \
+TX_OUTLINE_EXTENSION, TX_COLORING_EXTENSION
 
 
 this_folder = dirname(__file__)
 
+
 class Configuration(object):
 
-    def __init__(self, root_uri, workspace):
+    def __init__(self, root_uri):
         self.root_uri = root_uri
-        self.workspace = workspace
-        self.txconfig_uri = join(uris.to_fs_path(root_uri),'.txconfig')
+        self.txconfig_uri = join(uris.to_fs_path(root_uri), TX_CONFIG_EXTENSION)
         self.config_model = None
 
         self._loader = lambda path, classes=[], builtins={}: \
@@ -48,10 +48,13 @@ class Configuration(object):
     
     def load_configuration(self):
         try:
-            self.config_model = self.get_mm_by_ext('.txconfig').model_from_file(self.txconfig_uri)
+            self.config_model = self.get_mm_by_ext(TX_CONFIG_EXTENSION) \
+                                    .model_from_file(self.txconfig_uri)
             self.load_metamodel()
         except:
-            self.workspace.show_message("Error in .txconfig file.")
+            return False
+
+        return True
     
 
     def load_metamodel(self):
@@ -72,8 +75,8 @@ class Configuration(object):
 
  
     def get_all_extensions(self):
-        return flatten([ext for ext, _ in self.dsls_info])
-        
+        return flatten([ext for ext, _ in self.dsls_info])   
+
 
     @property
     def language_name(self):
@@ -108,8 +111,10 @@ class Configuration(object):
         return self.getValue('path', 'coloring')
 
     @property
-    def outline_path(self):
-        return self.getValue('path', 'outline')
+    def outline_model(self):
+        outline_mm = self.get_mm_by_ext(TX_OUTLINE_EXTENSION)
+        path = self.getValue('path', 'outline')
+        return outline_mm.model_from_file(join(uris.to_fs_path(self.root_uri), path))
 
     @property
     def genereting_path(self):

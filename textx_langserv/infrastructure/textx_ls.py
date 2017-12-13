@@ -3,6 +3,7 @@ import hashlib
 import os
 
 from utils import _utils, uris
+from utils.constants import TX_OUTLINE_COMMAND
 from infrastructure import lsp
 from infrastructure.language_server import LanguageServer
 from infrastructure.workspace import Workspace
@@ -14,6 +15,8 @@ from capabilities.hover import hover
 from capabilities.definitions import definitions
 from capabilities.find_references import find_all_references
 
+from commands.outline import OutlineTree
+
 from infrastructure.dsl_handler import TxDslHandler
 
 log = logging.getLogger(__name__)
@@ -22,8 +25,16 @@ class TextXLanguageServer(LanguageServer):
 
     workspace = None
     configuration = None
-    tx_dsl_handlers = {}
     dsl_extension = None
+    tx_dsl_handlers = {}
+
+    commands = {
+        TX_OUTLINE_COMMAND: lambda ls, args: OutlineTree(
+                                ls.tx_dsl_handlers[ls.dsl_extension].model_source,
+                                ls.configuration.outline_model,
+                                ls.tx_dsl_handlers[ls.dsl_extension].last_valid_model
+                                            ).make_tree()
+    }
 
     def capabilities(self):
         return {
@@ -41,7 +52,7 @@ class TextXLanguageServer(LanguageServer):
             'documentSymbolProvider': True,
             'definitionProvider': True,
             'executeCommandProvider': {
-                'commands': ['genext','corefresh', 'test']
+                'commands': ['genext','outline.refresh']
             },
             'hoverProvider': True,
             'referencesProvider': True,
@@ -58,7 +69,7 @@ class TextXLanguageServer(LanguageServer):
         self.init_opts = init_opts
 
         self.workspace = Workspace(root_uri, self)
-        self.configuration = Configuration(root_uri, self.workspace)
+        self.configuration = Configuration(root_uri)
 
 
     def m_text_document__did_close(self, textDocument=None, **_kwargs):
@@ -151,10 +162,10 @@ class TextXLanguageServer(LanguageServer):
         for change in _kwargs['changes']:
             # Check if configuration file is changed
             if uris.to_fs_path(change['uri']) == self.configuration.txconfig_uri:
-                try:
-                    self.configuration.load_configuration()
+                loaded = self.configuration.load_configuration()
+                if loaded:
                     self.workspace.show_message("You have to reopen your tabs or restart vs code.")
-                except:
+                else:
                     self.workspace.show_message("Error in .txconfig file.")
             # TODO: Check if metamodel is changed
                 
@@ -166,5 +177,4 @@ class TextXLanguageServer(LanguageServer):
         
 
     def m_workspace__execute_command(self, command=None, arguments=None):
-        print(command)
-        #return [1,2,3,4,5]
+        return self.commands[command](self, arguments)
