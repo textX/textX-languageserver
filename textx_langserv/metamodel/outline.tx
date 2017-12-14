@@ -1,13 +1,13 @@
-Program:
+Outline:
 	rules*=Rule
 ;
 
 Rule:
-	name=ID '{' choices=Choice '}'
-;
-
-Choice:
-	(label=Label | icon=Icon)*
+	name=ID
+	'{'
+		label=Label
+		(icon=Icon)?
+	'}'
 ;
 
 Label:

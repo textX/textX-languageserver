@@ -1,9 +1,9 @@
-Program:
+Coloring:
 	configuration=Configuration? rules*=Rule
 ;
 
 Rule:
-	rules=Rules | keywords=Keywords | regular_expressions = RegularExpressions
+	rules=Rules | matches=Matches | regular_expressions = RegularExpressions
 ;
 
 Configuration:
@@ -66,11 +66,11 @@ RuleList:
 	elements+=ID[','] '->' type=Type ';'
 ;
 
-Keywords:
-	'keywords' '=' '{' keword_list*=KeywordList '}'
+Matches:
+	'matches' '=' '{' match_list*=MatchList '}'
 ;
 
-KeywordList:
+MatchList:
 	words*=STRING[','] '->' type=Type ';'
 ;
 

@@ -1,6 +1,5 @@
 import sys
-from os.path import join, dirname, basename
-from textx.metamodel import metamodel_from_file
+from os.path import basename
 import json
 
 
@@ -21,7 +20,7 @@ class OutlineTree(object):
         self.nodes = []
         self.start_position_in_lines = []
         self.fill_end_position_in_lines()
-        self.visit_rule(current_model, 1)
+        self.visit_rule(current_model)
 
     def fill_end_position_in_lines(self):
         counter = 0
@@ -30,15 +29,15 @@ class OutlineTree(object):
             counter += len(line) + 2
         self.start_position_in_lines.append(sys.maxsize)
 
-    def visit_rule(self, rule, mult):
-        if (mult == 1):
+    def visit_rule(self, rule, mult='1'):
+        if (mult == '1'):
             subrules = rule._tx_attrs
             values = {}
             for subrule in subrules:
                 child = getattr(rule, subrule)
                 attr = subrules[subrule]
                 if attr.cont == False:
-                    if self.convert_mult(attr.mult) == 1:
+                    if attr.mult == '1':
                         values[subrule] = child.name
                         continue
                     else:
@@ -50,18 +49,11 @@ class OutlineTree(object):
                 if attr.ref == False:
                     values[subrule] = child
                     continue
-                self.visit_rule(child, self.convert_mult(attr.mult))
+                self.visit_rule(child, attr.mult)
             self.proccess_rule(values, rule)
         else:
             for item in rule:
-                self.visit_rule(item, 1)
-            pass
-
-    def convert_mult(self, mult):
-        if (mult == '1'):
-            return 1
-        else:
-            return 2
+                self.visit_rule(item)
 
     def proccess_rule(self, values, rule, label=None):
         rule_name = type(rule).__name__
@@ -70,8 +62,11 @@ class OutlineTree(object):
         for outline_rule in self.outline_model.rules:
             if outline_rule.name == rule_name:
                 if label == None:
-                    label = self.get_label(values, outline_rule.choices.label.names)
-                node = Node(rule_name, label, basename(outline_rule.choices.icon.path), rule._tx_position, rule._tx_position_end)
+                    label = self.get_label(values, outline_rule.label.names)
+                icon = None
+                if outline_rule.icon != None:
+                    icon = outline_rule.icon.path
+                node = Node(rule_name, label, icon, rule._tx_position, rule._tx_position_end)
                 self.nodes.append(node)
 
     def get_label(self, values, names):
@@ -89,9 +84,11 @@ class OutlineTree(object):
     def make_tree(self):
         children = self.determine_parent_child_relation()
         for node in self.nodes:
-            self.remove_grandchildren(node)
+            if node in self.nodes:
+                self.remove_grandchildren(node)
         for child in children:
-            self.nodes.remove(child)
+            if child in self.nodes:
+                self.nodes.remove(child)
         return json.dumps(self.make_nodes())
 
     def determine_parent_child_relation(self):
@@ -115,7 +112,8 @@ class OutlineTree(object):
                 if grandchild not in children:
                     children.append(grandchild)
         for child in children:
-            node.children.remove(child)
+            if child in self.nodes:
+                node.children.remove(child)
 
     def make_nodes(self, nodes=None):
         objects = []
@@ -146,4 +144,3 @@ class OutlineTree(object):
                 point['column'] = position - self.start_position_in_lines[line - 1]
                 break
         return point
-
