@@ -1,17 +1,22 @@
-import sys
-from os.path import basename
-import json
+from utils._utils import pos_to_line_col
+from json import JSONEncoder
 
+class MyEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 
 class Node(object):
-    def __init__(self, type, label, icon, start, end):
+    def __init__(self, type, label, icon, start, end, start_line, start_point_in_line, end_line, end_point_in_line):
         self.type = type
         self.label = label
         self.icon = icon
         self.start = start
         self.end = end
+        self.start_line = start_line
+        self.start_point_in_line = start_point_in_line
+        self.end_line = end_line
+        self.end_point_in_line = end_point_in_line
         self.children = []
-
 
 class OutlineTree(object):
     def __init__(self, model_source, outline_model, current_model):
@@ -19,15 +24,7 @@ class OutlineTree(object):
         self.outline_model = outline_model
         self.nodes = []
         self.start_position_in_lines = []
-        self.fill_end_position_in_lines()
         self.visit_rule(current_model)
-
-    def fill_end_position_in_lines(self):
-        counter = 0
-        for line in self.model_source.splitlines():
-            self.start_position_in_lines.append(counter)
-            counter += len(line) + 2
-        self.start_position_in_lines.append(sys.maxsize)
 
     def visit_rule(self, rule, mult='1'):
         if (mult == '1'):
@@ -66,7 +63,9 @@ class OutlineTree(object):
                 icon = None
                 if outline_rule.icon != None:
                     icon = outline_rule.icon.path
-                node = Node(rule_name, label, icon, rule._tx_position, rule._tx_position_end)
+                start_line, start_point_in_line = pos_to_line_col(self.model_source, rule._tx_position)
+                end_line, end_point_in_line = pos_to_line_col(self.model_source, rule._tx_position_end)
+                node = Node(rule_name, label, icon, rule._tx_position, rule._tx_position_end, start_line, start_point_in_line, end_line, end_point_in_line)
                 self.nodes.append(node)
 
     def get_label(self, values, names):
@@ -89,7 +88,7 @@ class OutlineTree(object):
         for child in children:
             if child in self.nodes:
                 self.nodes.remove(child)
-        return json.dumps(self.make_nodes())
+        return MyEncoder().encode(self.nodes)
 
     def determine_parent_child_relation(self):
         children = []
@@ -114,33 +113,3 @@ class OutlineTree(object):
         for child in children:
             if child in self.nodes:
                 node.children.remove(child)
-
-    def make_nodes(self, nodes=None):
-        objects = []
-        if nodes == None:
-            nodes = self.nodes
-        else:
-            nodes = nodes.children
-        for node in nodes:
-            obj = {}
-            obj['type'] = node.type
-            obj['label'] = node.label
-            obj['icon'] = node.icon
-            obj['children'] = self.make_nodes(node)
-            point = self.convert_position_in_point(node.start)
-            obj['start_line'] = point['row']
-            obj['start_point_in_line'] = point['column']
-            point = self.convert_position_in_point(node.end)
-            obj['end_line'] = point['row']
-            obj['end_point_in_line'] = point['column']
-            objects.append(obj)
-        return objects
-
-    def convert_position_in_point(self, position):
-        point = {}
-        for line in range(len(self.start_position_in_lines)):
-            if position < self.start_position_in_lines[line]:
-                point['row'] = line - 1
-                point['column'] = position - self.start_position_in_lines[line - 1]
-                break
-        return point

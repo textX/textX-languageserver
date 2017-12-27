@@ -1,6 +1,7 @@
+import os
 import functools
 import threading
-import re
+
 
 def debounce(interval_s):
     """Debounce calls to this function until interval_s seconds have passed."""
@@ -26,7 +27,7 @@ def line_col_to_pos(source, position):
     lines = source.splitlines()
     offset = 0
     for l in range(0,line):
-        offset += (len(lines[l]) + 2)
+        offset += (len(lines[l]) + len(os.linesep))
     offset += col
 
     return offset
@@ -36,7 +37,7 @@ def pos_to_line_col(source, pos):
     line = 0
     lines = source.splitlines()
     for l in lines:
-        temp = pos - (len(lines[line]) + 2)
+        temp = pos - (len(lines[line]) + len(os.linesep))
         if temp >= 0:
             pos = temp
             line += 1
