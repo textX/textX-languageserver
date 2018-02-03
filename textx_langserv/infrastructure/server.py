@@ -1,9 +1,10 @@
 # Copyright 2017 Palantir Technologies, Inc.
+from jsonrpc import jsonrpc2, JSONRPCResponseManager
+
 import json
 import logging
 import uuid
 
-from jsonrpc import jsonrpc2, JSONRPCResponseManager
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +58,8 @@ class JSONRPCServer(object):
                     elif 'error' in msg and on_error:
                         on_error(msg['error'])
             except Exception:
-                log.exception("Language server exiting due to uncaught exception")
+                log.exception("Language server exiting \
+                               due to uncaught exception")
                 break
 
     def call(self, method, params=None, on_result=None, on_error=None):

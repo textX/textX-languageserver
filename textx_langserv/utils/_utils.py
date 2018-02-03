@@ -23,10 +23,10 @@ def flatten(list_of_lists):
 def line_col_to_pos(source, position):
     line = position['line']
     col = position['character']
-    
+
     lines = source.splitlines()
     offset = 0
-    for l in range(0,line):
+    for l in range(0, line):
         offset += (len(lines[l]) + len(os.linesep))
     offset += col
 

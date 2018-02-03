@@ -1,3 +1,6 @@
+from textx_langserv.utils import uris
+from textx_langserv.infrastructure.server import JSONRPCServer
+
 import logging
 import re
 import socketserver
@@ -5,8 +8,6 @@ import os
 
 log = logging.getLogger(__name__)
 
-from utils import uris
-from infrastructure.server import JSONRPCServer
 
 class _StreamHandlerWrapper(socketserver.StreamRequestHandler, object):
     """A wrapper class that is used to construct a custom handler class."""
@@ -35,7 +36,8 @@ def start_tcp_lang_server(bind_addr, port, handler_class):
     server = socketserver.ThreadingTCPServer((bind_addr, port), wrapper_class)
 
     try:
-        log.info("Serving %s on (%s, %s)", handler_class.__name__, bind_addr, port)
+        log.info("Serving %s on (%s, %s)",
+                 handler_class.__name__, bind_addr, port)
         server.serve_forever()
     except KeyboardInterrupt:
         server.shutdown()
@@ -46,7 +48,8 @@ def start_tcp_lang_server(bind_addr, port, handler_class):
 
 def start_io_lang_server(rfile, wfile, handler_class):
     if not issubclass(handler_class, JSONRPCServer):
-        raise ValueError("Handler class must be a subclass of LanguageJSONRPCServereServer")
+        raise ValueError("Handler class must be a \
+                          subclass of LanguageJSONRPCServereServer")
     log.info("Starting %s IO language server", handler_class.__name__)
     server = handler_class(rfile, wfile)
     server.handle()
@@ -56,7 +59,10 @@ class MethodJSONRPCServer(JSONRPCServer):
     """JSONRPCServer that calls methods on itself with params."""
 
     def __getitem__(self, item):
-        """The jsonrpc dispatcher uses getitem to retrieve the RPC method implementation."""
+        """
+        The jsonrpc dispatcher uses getitem
+        to retrieve the RPC method implementation.
+        """
         method_name = "m_" + _method_to_string(item)
         if not hasattr(self, method_name):
             raise KeyError("Cannot find method %s" % method_name)
@@ -65,7 +71,8 @@ class MethodJSONRPCServer(JSONRPCServer):
         def wrapped(*args, **kwargs):
             try:
                 if 'textDocument' in kwargs.keys():
-                    name, ext = os.path.splitext(os.path.basename(kwargs['textDocument']['uri']))
+                    name, ext = os.path.splitext(
+                            os.path.basename(kwargs['textDocument']['uri']))
                     # If file does not have name (e.g. -> .txconfig)
                     if not ext:
                         ext = name

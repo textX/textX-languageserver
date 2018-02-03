@@ -1,19 +1,29 @@
-from utils import _utils
-from infrastructure.lsp import Completions, CompletionItemKind
+"""
+Not finished.
+Will be changed soon.
+"""
+from arpeggio import Match, EndOfFile
 
 from textx.exceptions import TextXSemanticError, TextXSyntaxError
 from textx.const import MULT_ASSIGN_ERROR, UNKNOWN_OBJ_ERROR
 from textx.lang import BASE_TYPE_RULES
 
-from arpeggio import Match, EndOfFile
+from textx_langserv.utils import _utils
+from textx_langserv.infrastructure.lsp import Completions, CompletionItemKind
+
+__author__ = "Daniel Elero"
+__copyright__ = "textX-tools"
+__license__ = "MIT"
+
 
 # Dictionary for random rule matches
 FAKE_RULE_MATCHES = {
-    "ID" : " aaaBBBcccDDDeeeFFFgggHHHiiiJJJkkkLLLmmmNNN "
+    "ID": " aaaBBBcccDDDeeeFFFgggHHHiiiJJJkkkLLLmmmNNN "
 }
 
 # String to insert in model to make syntax errors
-FAKE_SYN_CHARS = "#@#$(&!$"
+# MAKE SURE THAT STARTING CHAR IS NOT SAME AS COMMENT RULE:)
+FAKE_SYN_CHARS = "&&^^&&)(A)21_"   # "#@#$(&!$"
 
 # 
 MAX_RECURSION_CALLS = 20
@@ -35,7 +45,8 @@ def completions(model_source, position, tx_dsl_handler):
 
     # If model is valid, create fake model
     if tx_dsl_handler.is_valid_model:
-        model_source = model_source[:offset] + FAKE_SYN_CHARS + model_source[offset:]
+        model_source = model_source[:offset] + FAKE_SYN_CHARS + \
+                        model_source[offset:]    
 
     def _get_completions(model_source, offset):
         """
@@ -45,15 +56,16 @@ def completions(model_source, position, tx_dsl_handler):
         Returns:
             items(list): List of strings (completion items)
         """
-        
+
         # recursion counter
         _get_completions.rcounter += 1
 
         # Parse fake model and get errors
-        syntax_errors, semantic_errors = tx_dsl_handler.fake_parse_model(model_source)
+        syntax_errors, semantic_errors = \
+            tx_dsl_handler.fake_parse_model(model_source)
 
         # Remove fake string which is added to make errors
-        model_source = model_source.replace(FAKE_SYN_CHARS,'')
+        model_source = model_source.replace(FAKE_SYN_CHARS, '')
 
         # If error type is TextXSemanticError
         if len(semantic_errors) > 0:
@@ -68,16 +80,17 @@ def completions(model_source, position, tx_dsl_handler):
                     # Get derived class names if exists
                     cls_names = []
                     try:
-                        cls_names.extend([c.__name__ for c in e.expected_obj_cls._tx_inh_by
-                                                        if hasattr(c,'__name__')])
+                        cls_names.extend([c.__name__
+                                          for c
+                                          in e.expected_obj_cls._tx_inh_by
+                                          if hasattr(c, '__name__')])
                     except:
                         cls_names.append(e.expected_obj_cls.__name__)
 
-                    
-
                     return [obj.name
-                        for obj in tx_dsl_handler.get_all_rules()
-                        if hasattr(obj,'name') and type(obj).__name__ in cls_names]
+                            for obj in tx_dsl_handler.get_all_rules()
+                            if hasattr(obj, 'name') and
+                            type(obj).__name__ in cls_names]
 
                 elif e.err_type == MULT_ASSIGN_ERROR:
                     # Find out what to do here
@@ -87,7 +100,7 @@ def completions(model_source, position, tx_dsl_handler):
         if len(syntax_errors) > 0:
             # Arrpegio currently returns just one error
             err = syntax_errors[0]
-            
+
             # Coppied from arpeggio
             def rule_to_exp_str(rule):
                 if hasattr(rule, '_exp_str'):
@@ -101,16 +114,18 @@ def completions(model_source, position, tx_dsl_handler):
                 else:
                     return rule.name
 
-
-            # If it's not possible to make semantic errors save first expected rule matches
+            # If it's not possible to make semantic errors save first expected
+            # rule matches
             if len(_get_completions.items) == 0:
-                _get_completions.items.extend([rule_to_exp_str(r) for r in err.expected_rules
-                        if rule_to_exp_str(r) not in EXCLUDE_FROM_COMPLETIONS ])
-            
+                _get_completions.items.extend(
+                    [rule_to_exp_str(r)
+                        for r in err.expected_rules
+                        if rule_to_exp_str(r) not in EXCLUDE_FROM_COMPLETIONS])
+
             # Return items if max recursion calls are reached
             if _get_completions.rcounter == MAX_RECURSION_CALLS:
                 return _get_completions.items
-            
+
             # Try to make valid string to get semantic error if possible
             # Add random rule match to model source and invoke _get_completions
             # with a new fake model and offset
@@ -118,22 +133,22 @@ def completions(model_source, position, tx_dsl_handler):
             # TODO: If rule is optional, don't try to add it)
             for e in err.expected_rules:
                 str_to_add = ''
-                if hasattr(e,'rule_name'):
+                if hasattr(e, 'rule_name'):
                     if e.rule_name in FAKE_RULE_MATCHES.keys():
                         str_to_add = FAKE_RULE_MATCHES[e.rule_name]
-                    elif hasattr(e,'to_match') and e.rule_name.strip() == '':
+                    elif hasattr(e, 'to_match') and e.rule_name.strip() == '':
                         str_to_add = " {} ".format(e.to_match)
                     else:
                         # ?
                         str_to_add = FAKE_RULE_MATCHES["ID"]
 
                 if str_to_add != '':
-                    new_model_source = model_source[:offset] + str_to_add + model_source[offset:]
-                    return _get_completions(new_model_source, offset + len(str_to_add))
-
+                    new_model_source = model_source[:offset] + str_to_add + \
+                        model_source[offset:]
+                    return _get_completions(new_model_source, offset +
+                                            len(str_to_add))
 
         return _get_completions.items
-
 
     # Init
     _get_completions.rcounter = 0

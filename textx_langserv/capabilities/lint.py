@@ -1,14 +1,22 @@
-from utils import _utils
-from infrastructure.lsp import Diagnostic
+"""
+This module is responsible for linting document file.
+"""
+from textx_langserv.utils import _utils
+from textx_langserv.infrastructure.lsp import Diagnostic
 
-from textx.metamodel import metamodel_from_file
-from textx.export import metamodel_export, model_export
-from textx.exceptions import TextXError
+__author__ = "Daniel Elero"
+__copyright__ = "textX-tools"
+__license__ = "MIT"
+
 
 LINT_DEBOUNCE_S = 0.5
 
+
 @_utils.debounce(LINT_DEBOUNCE_S)
 def lint(doc_uri, workspace, tx_dsl_handler):
+    """
+    Create and return diagnostic object which contains all parsing errors
+    """
     if doc_uri in workspace.documents:
         diagnostic = Diagnostic()
         errors = tx_dsl_handler.all_errors

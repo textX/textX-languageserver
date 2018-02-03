@@ -4,8 +4,8 @@ import os
 import re
 import sys
 
-from infrastructure import lsp
-from utils import uris
+from textx_langserv.infrastructure import lsp
+from textx_langserv.utils import uris
 
 log = logging.getLogger(__name__)
 
@@ -40,13 +40,14 @@ class Workspace(object):
         return self._root_uri
 
     def is_local(self):
-        return (self._root_uri_scheme == '' or self._root_uri_scheme == 'file') and os.path.exists(self._root_path)
+        return (self._root_uri_scheme == '' or
+                self._root_uri_scheme == 'file') \
+                and os.path.exists(self._root_path)
 
     def get_document(self, doc_uri):
         return self._docs[doc_uri]
 
     def put_document(self, doc_uri, content, version=None):
-        path = uris.to_fs_path(doc_uri)
         self._docs[doc_uri] = Document(
             doc_uri, content, version=version
         )
@@ -140,7 +141,9 @@ class Document(object):
         self._source = new.getvalue()
 
     def word_at_position(self, position):
-        """Get the word under the cursor returning the start and end positions."""
+        """
+        Get the word under the cursor returning the start and end positions.
+        """
         line = self.lines[position['line']]
         i = position['character']
         # Split word in two

@@ -73,8 +73,8 @@ class Diagnostic(object):
 
     def error(self, line, col, message, severity=None, code=None, source=None):
         range = {
-                    'start': { 'line': line-1, 'col': col},
-                    'end': { 'line': line-1, 'col': col+1}
+                    'start': {'line': line-1, 'col': col},
+                    'end': {'line': line-1, 'col': col+1}
                 }
         self.diagnostics.append({
             'range': range,
@@ -94,15 +94,15 @@ class Completions(object):
         self.completions = []
 
     def add_completion(self, label,
-                        kind=CompletionItemKind.Keyword,
-                        insert_text_format=1,
-                        insert_text=None,
-                        sort=None,
-                        detail=None,
-                        documentation=None):
+                       kind=CompletionItemKind.Keyword,
+                       insert_text_format=1,
+                       insert_text=None,
+                       sort=None,
+                       detail=None,
+                       documentation=None):
         self.completions.append({
             'label': label,
-            'kind': kind, # ? or 1
+            'kind': kind,
             'sortText': len(self.completions),
             'insertTextFormat': insert_text_format,
             'insertText': insert_text

@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+import sys
+import codecs
 from setuptools import setup, find_packages
 
-NAME = 'textXlangServer'
+NAME = 'textXLanguageServer'
 DESC = 'Language server for DSLs created with textX'
 VERSION = '1.0.0'
 AUTHOR = 'Daniel Elero'
-AUTHOR_EMAIL = ''
-LICENSE = ''
-URL = ''
-DOWNLOAD_URL = ''
+AUTHOR_EMAIL = 'danixeee AT gmail DOT com'
+LICENSE = 'MIT'
+URL = 'https://github.com/textX-tools/textX-languageserver'
 README = ''
-
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
+# README = codecs.open(os.path.join(os.path.dirname(__file__), 'README.rst'),
+#                      'r', encoding='utf-8').read()
 
 setup(
     name=NAME,
@@ -26,8 +27,8 @@ setup(
     maintainer_email=AUTHOR_EMAIL,
     license=LICENSE,
     url=URL,
-    download_url=DOWNLOAD_URL,
-    packages=["..."],
+    packages=find_packages(),
+    package_data={'textx_langserv.metamodel': ['*tx']},
     install_requires=[
         'funcsigs==1.0.2',
         'Jinja2==2.9.6',
@@ -36,13 +37,14 @@ setup(
         'jsonschema==2.6.0',
         'MarkupSafe==1.0',
         'six==1.11.0',
-        'websockets==3.4'
+        'websockets==3.4',
+        'Arpeggio==1.7',
+        'textX'
     ],
     dependency_links=[
-        '-e git+https://github.com/textX-tools/Arpeggio.git#egg=Arpeggio',
-        '-e git+https://github.com/textX-tools/textX.git#egg=textX'
+        'https://github.com/textX-tools/textX/tarball/pull_request#egg=textX'
     ],
-    keywords="",
+    keywords="textx vscode extension",
     entry_points={
         'console_scripts': [
             'textxls = textx_langserv.__main__:main'
