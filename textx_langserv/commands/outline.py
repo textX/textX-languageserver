@@ -1,12 +1,25 @@
-from utils._utils import pos_to_line_col
+"""
+This module is responsible for creating and returning
+outline tree data.
+"""
+from textx_langserv.utils._utils import pos_to_line_col
 from json import JSONEncoder
 
+__author__ = "Nemanja Starčev"
+__copyright__ = "textX-tools"
+__license__ = "MIT"
+
+
 class MyEncoder(JSONEncoder):
+
     def default(self, o):
         return o.__dict__
 
+
 class Node(object):
-    def __init__(self, type, label, icon, start, end, start_line, start_point_in_line, end_line, end_point_in_line):
+    def __init__(self, type, label, icon,
+                 start, end, start_line,
+                 start_point_in_line, end_line, end_point_in_line):
         self.type = type
         self.label = label
         self.icon = icon
@@ -17,6 +30,7 @@ class Node(object):
         self.end_line = end_line
         self.end_point_in_line = end_point_in_line
         self.children = []
+
 
 class OutlineTree(object):
     def __init__(self, model_source, outline_model, current_model):
@@ -33,7 +47,7 @@ class OutlineTree(object):
             for subrule in subrules:
                 child = getattr(rule, subrule)
                 attr = subrules[subrule]
-                if attr.cont == False:
+                if attr.cont is False:
                     if attr.mult == '1':
                         values[subrule] = child.name
                         continue
@@ -41,9 +55,9 @@ class OutlineTree(object):
                         for item in child:
                             self.proccess_rule(values, rule, item.name)
                         continue
-                if child == None:
+                if child is None:
                     continue
-                if attr.ref == False:
+                if attr.ref is False:
                     values[subrule] = child
                     continue
                 self.visit_rule(child, attr.mult)
@@ -54,18 +68,25 @@ class OutlineTree(object):
 
     def proccess_rule(self, values, rule, label=None):
         rule_name = type(rule).__name__
-        if len(values) == 0 and label == None:
+        if len(values) == 0 and label is None:
             return
         for outline_rule in self.outline_model.rules:
             if outline_rule.name == rule_name:
-                if label == None:
+                if label is None:
                     label = self.get_label(values, outline_rule.label.names)
                 icon = None
-                if outline_rule.icon != None:
+                if outline_rule.icon is not None:
                     icon = outline_rule.icon.path
-                start_line, start_point_in_line = pos_to_line_col(self.model_source, rule._tx_position)
-                end_line, end_point_in_line = pos_to_line_col(self.model_source, rule._tx_position_end)
-                node = Node(rule_name, label, icon, rule._tx_position, rule._tx_position_end, start_line, start_point_in_line, end_line, end_point_in_line)
+                start_line, start_point_in_line = pos_to_line_col(
+                                                    self.model_source,
+                                                    rule._tx_position)
+                end_line, end_point_in_line = pos_to_line_col(
+                                                    self.model_source,
+                                                    rule._tx_position_end)
+                node = Node(rule_name, label, icon,
+                            rule._tx_position, rule._tx_position_end,
+                            start_line, start_point_in_line,
+                            end_line, end_point_in_line)
                 self.nodes.append(node)
 
     def get_label(self, values, names):
