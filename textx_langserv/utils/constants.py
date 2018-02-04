@@ -6,3 +6,4 @@ TX_TX_EXTENSION = '.tx'
 
 # Commands
 TX_OUTLINE_COMMAND = 'outline.refresh'
+TX_GENEXT_COMMAND = 'generator.vscode'

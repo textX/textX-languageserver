@@ -19,8 +19,6 @@ def find_all_references(doc_uri, position, context, tx_dsl_handler):
 
         source = tx_dsl_handler.model_source
 
-        offset = _utils.line_col_to_pos(source, position)
-
         # List of all references in model
         crossref_list = tx_dsl_handler.last_valid_model._pos_crossref_list
 

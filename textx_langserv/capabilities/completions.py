@@ -1,6 +1,22 @@
 """
 Not finished.
 Will be changed soon.
+
+NOTE:
+The idea was to try to create a text, at cursor position, which will
+satisfy the rule in syntax way. If the rule definition contain a reference
+to another rule instances in model, textX will raise semantic error and
+this module should return rule instances as Completion items.
+
+Issues:
+    - Arpeggio needs to return for every rule or token, an information if
+    that rule/token is optional or not
+    - Even if module works like described above, the function will return
+    semantic error (referenced rule instances) every time.
+    (We have to know if token in a rule is a reference or not)
+    - Performanse
+
+For now, module simple_completions.py will be used instead of this.
 """
 from arpeggio import Match, EndOfFile
 

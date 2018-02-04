@@ -3,7 +3,8 @@ import hashlib
 import os
 
 from textx_langserv.utils import _utils, uris
-from textx_langserv.utils.constants import TX_OUTLINE_COMMAND
+from textx_langserv.utils.constants import TX_OUTLINE_COMMAND,\
+    TX_GENEXT_COMMAND
 from textx_langserv.infrastructure import lsp
 from textx_langserv.infrastructure.language_server import LanguageServer
 from textx_langserv.infrastructure.workspace import Workspace
@@ -14,6 +15,7 @@ from textx_langserv.capabilities.lint import lint
 from textx_langserv.capabilities.hover import hover
 from textx_langserv.capabilities.definitions import definitions
 from textx_langserv.capabilities.find_references import find_all_references
+from textx_langserv.capabilities.code_lens import code_lens
 
 from textx_langserv.commands.outline import OutlineTree
 
@@ -61,7 +63,9 @@ class TextXLanguageServer(LanguageServer):
             'documentSymbolProvider': True,
             'definitionProvider': True,
             'executeCommandProvider': {
-                'commands': ['genext', 'outline.refresh']
+                'commands': [TX_GENEXT_COMMAND,
+                             TX_OUTLINE_COMMAND,
+                             ]
             },
             'hoverProvider': True,
             'referencesProvider': True,
@@ -124,13 +128,11 @@ class TextXLanguageServer(LanguageServer):
         pass
 
     def m_text_document__code_lens(self, textDocument=None, **_kwargs):
-        # return [{
-        #     'range': {
-        #         'start': {'line': 3, 'character': 2},
-        #         'end': {'line': 3, 'character': 10}
-        #     }
-        # }]
-        pass
+        handler = self.tx_dsl_handlers[self.dsl_extension]
+        handler.parse_model(
+            self.workspace.documents[textDocument['uri']].source)
+        model_source = self.workspace.get_document(textDocument['uri']).source
+        return code_lens(model_source, handler)
 
     def m_text_document__completion(self, textDocument=None, position=None,
                                     **_kwargs):
