@@ -157,7 +157,7 @@ class TextXLanguageServer(LanguageServer):
 
     def m_text_document__document_symbol(self, textDocument=None, **_kwargs):
         pass
-    
+
     # def m_text_document__document_highlight(self, textDocument=None,
     #                                         **_kwargs):
     #     # return self.document_symbols(textDocument['uri'])

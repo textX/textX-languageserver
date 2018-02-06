@@ -56,7 +56,11 @@ def code_lens(model_source, tx_dsl_handler):
                         },
                         'command': {
                             'title': REFERENCE_TEXT_LENS.format(ref_count),
-                            # 'command': 'LENS_REFERENCES'
+                            'command': 'code_lens_references',
+                            'arguments': [
+                                    def_pos_start[0],       # line
+                                    def_pos_start[1] + 1,   # character
+                            ]
                         }
                     } for ref_count, def_pos_start, def_pos_end in
                     rule_ref_dict.values()]
