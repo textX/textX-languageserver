@@ -3,12 +3,11 @@ import hashlib
 import os
 
 from textx_langserv.utils import _utils, uris
-from textx_langserv.utils.constants import TX_OUTLINE_COMMAND,\
-    TX_GENEXT_COMMAND
-from textx_langserv.infrastructure import lsp
 from textx_langserv.infrastructure.language_server import LanguageServer
 from textx_langserv.infrastructure.workspace import Workspace
 from textx_langserv.infrastructure.configuration import Configuration
+
+from textx_langserv.capabilities import get_capabilities
 
 from textx_langserv.capabilities.completions import completions
 from textx_langserv.capabilities.lint import lint
@@ -17,7 +16,7 @@ from textx_langserv.capabilities.definitions import definitions
 from textx_langserv.capabilities.find_references import find_all_references
 from textx_langserv.capabilities.code_lens import code_lens
 
-from textx_langserv.commands.outline import OutlineTree
+from textx_langserv.commands import get_commands
 
 from textx_langserv.infrastructure.dsl_handler import TxDslHandler
 
@@ -38,42 +37,10 @@ class TextXLanguageServer(LanguageServer):
     dsl_extension = None
     tx_dsl_handlers = {}
 
-    commands = {
-        TX_OUTLINE_COMMAND: lambda ls, args: OutlineTree(
-                                ls.tx_dsl_handlers[ls.dsl_extension]
-                                  .model_source,
-                                ls.configuration.outline_model,
-                                ls.tx_dsl_handlers[ls.dsl_extension].
-                                last_valid_model).make_tree()
-    }
+    commands = get_commands()
 
     def capabilities(self):
-        return {
-            'codeActionProvider': True,
-            'codeLensProvider': {
-                'resolveProvider': False,
-            },
-            'completionProvider': {
-                'resolveProvider': False,
-                'triggerCharacters': ['.']
-            },
-            'documentFormattingProvider': True,
-            # 'documentHighlightProvider': True,
-            'documentRangeFormattingProvider': True,
-            'documentSymbolProvider': True,
-            'definitionProvider': True,
-            'executeCommandProvider': {
-                'commands': [TX_GENEXT_COMMAND,
-                             TX_OUTLINE_COMMAND,
-                             ]
-            },
-            'hoverProvider': True,
-            'referencesProvider': True,
-            'signatureHelpProvider': {
-                'triggerCharacters': ['(', ',']
-            },
-            'textDocumentSync': lsp.TextDocumentSyncKind.INCREMENTAL
-        }
+        return get_capabilities()
 
     def initialize(self, root_uri, init_opts, _process_id):
         self.process_id = _process_id

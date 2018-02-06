@@ -15,8 +15,6 @@ Issues:
     semantic error (referenced rule instances) every time.
     (We have to know if token in a rule is a reference or not)
     - Performanse
-
-For now, module simple_completions.py will be used instead of this.
 """
 from arpeggio import Match, EndOfFile
 
@@ -41,8 +39,8 @@ FAKE_RULE_MATCHES = {
 # MAKE SURE THAT STARTING CHAR IS NOT SAME AS COMMENT RULE:)
 FAKE_SYN_CHARS = "&&^^&&)(A)21_"   # "#@#$(&!$"
 
-# 
-MAX_RECURSION_CALLS = 20
+#
+MAX_RECURSION_CALLS = 2
 
 # Do not offer these items
 EXCLUDE_FROM_COMPLETIONS = ['Not', 'EOF']
@@ -78,7 +76,7 @@ def completions(model_source, position, tx_dsl_handler):
 
         # Parse fake model and get errors
         syntax_errors, semantic_errors = \
-            tx_dsl_handler.fake_parse_model(model_source)
+            tx_dsl_handler.parse_model(model_source, False)
 
         # Remove fake string which is added to make errors
         model_source = model_source.replace(FAKE_SYN_CHARS, '')
