@@ -1,6 +1,20 @@
 """
 Not finished.
 Will be changed soon.
+
+NOTE:
+The idea was to try to create a text, at cursor position, which will
+satisfy the rule in syntax way. If the rule definition contain a reference
+to another rule instances in model, textX will raise semantic error and
+this module should return rule instances as Completion items.
+
+Issues:
+    - Arpeggio needs to return for every rule or token, an information if
+    that rule/token is optional or not
+    - Even if module works like described above, the function will return
+    semantic error (referenced rule instances) every time.
+    (We have to know if token in a rule is a reference or not)
+    - Performanse
 """
 from arpeggio import Match, EndOfFile
 
@@ -25,8 +39,8 @@ FAKE_RULE_MATCHES = {
 # MAKE SURE THAT STARTING CHAR IS NOT SAME AS COMMENT RULE:)
 FAKE_SYN_CHARS = "&&^^&&)(A)21_"   # "#@#$(&!$"
 
-# 
-MAX_RECURSION_CALLS = 20
+#
+MAX_RECURSION_CALLS = 2
 
 # Do not offer these items
 EXCLUDE_FROM_COMPLETIONS = ['Not', 'EOF']
@@ -62,7 +76,7 @@ def completions(model_source, position, tx_dsl_handler):
 
         # Parse fake model and get errors
         syntax_errors, semantic_errors = \
-            tx_dsl_handler.fake_parse_model(model_source)
+            tx_dsl_handler.parse_model(model_source, False)
 
         # Remove fake string which is added to make errors
         model_source = model_source.replace(FAKE_SYN_CHARS, '')

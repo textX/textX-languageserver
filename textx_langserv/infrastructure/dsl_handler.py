@@ -27,58 +27,54 @@ class TxDslHandler(object):
         self.dsl_extension = dsl_extension
         self.last_valid_model = None
         self.model_source = None
-        self.is_valid_model = False
         self.syntax_errors = []
         self.semantic_errors = [] 
 
-    def parse_model(self, model_source):
-        # Reset errors
-        self.syntax_errors = []
-        self.semantic_errors = []
-
-        # Try to parse
-        try:
-            log.debug("Parsing model source: " + model_source)
-            self.model_source = model_source
-            model = self.configuration.get_mm_by_ext(self.dsl_extension)\
-                                      .model_from_str(model_source)
-            self.last_valid_model = model
-            self.is_valid_model = True
-            return model
-        except TextXSyntaxError as e:
-            log.debug("Parsing model syntax error: " + str(e))
-            self.syntax_errors.append(e)
-            self.is_valid_model = False
-        except TextXSemanticError as e:
-            log.debug("Parsing model semantic error: " + str(e))
-            self.semantic_errors.append(e)
-            self.is_valid_model = False
-
-    def fake_parse_model(self, fake_model_source):
+    def parse_model(self, model_source, change_state=True):
         """
-        If model is valid, we add some fake chars to it
-        so we can get syntax/semantic errors from arpeggio
-        and add them to the completion list.
+        Params:
+            model_source(string): Textual file representing
+                the model.
+            change_state(bool): If True, object's state will
+                be changed.
 
         Returns:
             List of syntax errors
             List of semantic errors
         """
+        # Return lists
         syn_errs = []
         sem_errs = []
 
+        # Parse
         try:
-            log.debug("FAKE parsing model source: " + fake_model_source)
-            self.configuration.get_mm_by_ext(self.dsl_extension)\
-                              .model_from_str(fake_model_source)
+            log.debug("Parsing model source: " + model_source)
+            model = self.configuration.get_mm_by_ext(self.dsl_extension)\
+                                      .model_from_str(model_source)
+
+            # Change object's state
+            if change_state:
+                log.debug("Parsing model. Model is valid. Source: {0}".format(
+                          model_source))
+                self.model_source = model_source
+                self.last_valid_model = model
+
         except TextXSyntaxError as e:
-            log.debug("FAKE parsing model syntax error: " + str(e))
+            log.debug("Parsing model syntax error: " + str(e))
             syn_errs.append(e)
         except TextXSemanticError as e:
-            log.debug("FAKE parsing model semantic error: " + str(e))
+            log.debug("Parsing model semantic error: " + str(e))
             sem_errs.append(e)
 
+        if change_state:
+            self.syntax_errors = syn_errs
+            self.semantic_errors = sem_errs
+
         return syn_errs, sem_errs
+
+    @property
+    def is_valid_model(self):
+        return len(list(self.all_errors)) == 0
 
     @property
     def all_errors(self):
