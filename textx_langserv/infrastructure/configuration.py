@@ -58,23 +58,25 @@ class Configuration(object):
             self.config_model = self.get_mm_by_ext(TX_CONFIG_EXTENSION) \
                                     .model_from_file(self.txconfig_uri)
             self.load_metamodel()
+            return True
         except:
             return False
 
-        return True
-
     def load_metamodel(self):
-        def get_func_from_module_path(path, module_name):
+        def exec_func_from_module_path(path, module_name):
             import imp
-            func_name = path[2:].split(':')[1]
-            path_name = path.replace(':{}'.format(func_name), '')
-            module = imp.load_source(module_name, path_name)
-            return getattr(module, func_name)
+            try:
+                func_name = path[2:].split(':')[1]
+                path_name = path.replace(':{}'.format(func_name), '')
+                module = imp.load_source(module_name, path_name)
+                return getattr(module, func_name)()
+            except:
+                return None
 
-        classes = get_func_from_module_path(self.mm_classes, 
-                                            "_custom_classes")()
-        builtins = get_func_from_module_path(self.mm_builtins,
-                                             "_custom_builtins")()
+        classes = exec_func_from_module_path(self.classes_path,
+                                             "_custom_classes")
+        builtins = exec_func_from_module_path(self.builtins_path,
+                                              "_custom_builtins")
 
         self.dsls_info.append((self.language_extensions,
                                partial(self._loader,
@@ -83,7 +85,7 @@ class Configuration(object):
                                        builtins)))
 
     def get_all_extensions(self):
-        return flatten([ext for ext, _ in self.dsls_info])   
+        return flatten([ext for ext, _ in self.dsls_info])
 
     @property
     def language_name(self):
@@ -95,68 +97,60 @@ class Configuration(object):
 
     @property
     def publisher(self):
-        return self.getValue('general', 'publisher')
+        return self.config_model.general_section.publisher
 
     @property
     def url(self):
-        return self.getValue('general', 'url')
+        return self.config_model.general_section.url
 
     @property
     def author(self):
-        return self.getValue('general', 'author')
+        return self.config_model.general_section.author
 
     @property
     def version(self):
-        return self.getValue('general', 'version')
+        return self.config_model.general_section.version
 
     @property
     def grammar_path(self):
-        return self.getValue('path', 'grammar')
+        path = self.config_model.paths_section.grammar_path
+        return to_fs_path(self.root_uri, path)
 
     @property
     def coloring_path(self):
-        return self.getValue('path', 'coloring')
+        path = self.config_model.paths_section.coloring_path
+        return to_fs_path(self.root_uri, path)
+
+    @property
+    def outline_path(self):
+        path = self.config_model.paths_section.outline_path
+        return to_fs_path(self.root_uri, path)
+
+    @property
+    def classes_path(self):
+        path = self.config_model.paths_section.classes_path
+        return to_fs_path(self.root_uri, path)
+
+    @property
+    def builtins_path(self):
+        path = self.config_model.paths_section.builtins_path
+        return to_fs_path(self.root_uri, path)
 
     @property
     def outline_model(self):
         outline_mm = self.get_mm_by_ext(TX_OUTLINE_EXTENSION)
-        path = self.getValue('path', 'outline')
+        path = self.outline_path
         return outline_mm.model_from_file(
             join(uris.to_fs_path(self.root_uri), path))
-
-    @property
-    def genereting_path(self):
-        return self.getValue('path', 'generating')
-
-    @property
-    def project_path(self):
-        return join(self.genereting_path, self.language_name)
-
-    @property
-    def mm_classes(self):
-        return self.getValue('path', 'classes')
-
-    @property
-    def mm_builtins(self):
-        return self.getValue('path', 'builtins')
-
-    def getValue(self, rule, option):
-        ret_val = None
-        for rule_item in self.config_model.rules:
-            if rule_item.name == rule:
-                for option_item in rule_item.options:
-                    if option_item.name == option:
-                        ret_val = option_item.value
-        if ret_val and rule == 'path':
-            return to_fs_path(self.root_uri, ret_val)
-
-        return ret_val
 
 
 def to_fs_path(root_uri, path):
     """
     Handle relative and absolute paths
     """
+    if path.isspace():
+        return None
+
     is_abs = os.path.isabs(path)
     if is_abs:
         return path

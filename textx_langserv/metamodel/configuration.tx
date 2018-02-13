@@ -1,15 +1,26 @@
 Program:
-	'lang' name=ID '[' extensions+=ID[','] ']' '{' rules*=Rule '}'
+	'dsl' name=ID '[' extensions+=ID[','] ']' '{'
+		general_section=GeneralSection?
+		paths_section=PathsSection
+	'}'
 ;
 
-Rule:
-	name=RuleName '{' options*=Option '}'
+GeneralSection:
+	'general' '{'
+		('publisher' ':'	publisher=STRING)?
+		('author' 	 ':'	author=STRING)?
+		('url' 	     ':'	url=STRING)?
+		('version' 	 ':'	version=STRING)?
+	'}'
 ;
 
-RuleName:
-	'general' | 'path' | 'command'
-;
+PathsSection:
+	'paths' '{'
+		'grammar'	':'	grammar_path=STRING
+		('outline'	':' outline_path=STRING)?
+		('coloring'	':'	coloring_path=STRING)?
+		('classes'	':' classes_path=STRING)?
+		('builtins'	':' builtins_path=STRING)?
 
-Option:
-	name=ID ':' value=STRING
+	'}'
 ;
