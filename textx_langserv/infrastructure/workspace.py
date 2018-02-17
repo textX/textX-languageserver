@@ -3,9 +3,12 @@ import logging
 import os
 import re
 import sys
+import itertools
 
 from textx_langserv.infrastructure import lsp
-from textx_langserv.utils import uris
+from textx_langserv.utils import uris, _utils
+
+from textx.exceptions import TextXSemanticError, TextXSyntaxError
 
 log = logging.getLogger(__name__)
 
@@ -45,19 +48,43 @@ class Workspace(object):
                 and os.path.exists(self._root_path)
 
     def get_document(self, doc_uri):
-        return self._docs[doc_uri]
+        try:
+            return self._docs[doc_uri]
+        except KeyError:
+            return None
 
     def put_document(self, doc_uri, content, version=None):
-        self._docs[doc_uri] = Document(
-            doc_uri, content, version=version
+        document = TextXDocument(
+            config=self._lang_server.configuration,
+            uri=doc_uri,
+            source=content,
+            version=version
         )
+        self._docs[doc_uri] = document
+        return document
 
     def rm_document(self, doc_uri):
-        self._docs.pop(doc_uri)
+        try:
+            self._docs.pop(doc_uri)
+        except KeyError:
+            pass
 
     def update_document(self, doc_uri, change, version=None):
         self._docs[doc_uri].apply_change(change)
         self._docs[doc_uri].version = version
+        # Parse new model
+        self._docs[doc_uri].parse_model(self._docs[doc_uri].source)
+
+    def parse_all(self):
+        for doc in self.documents.values():
+            doc.parse_model(doc.source)
+
+    def remove_by_extension(self, supported_extensions):
+        self._docs = {
+            key: val
+            for key, val in self.documents.items()
+            if val.file_ext in supported_extensions
+        }
 
     def apply_edit(self, edit):
         # Note that lang_server.call currently doesn't return anything
@@ -85,6 +112,12 @@ class Document(object):
 
     def __str__(self):
         return str(self.uri)
+
+    @property
+    def file_ext(self):
+        # If extension is None, return name (e.g. '.txconfig')
+        name, ext = os.path.splitext(self.filename)
+        return ext or name
 
     @property
     def lines(self):
@@ -156,3 +189,109 @@ class Document(object):
         m_end = RE_END_WORD.findall(end)
 
         return m_start[0] + m_end[-1]
+
+
+class TextXDocument(Document):
+
+    def __init__(self, config, uri, source=None, version=None, local=True):
+        super(TextXDocument, self).__init__(uri, source, version, local)
+
+        self.config = config
+
+        self.tx_last_valid_model = None
+        self.tx_syntax_errors = []
+        self.tx_semantic_errors = []
+
+        self.parse_model(self.source)
+
+    def parse_model(self, model_source, change_state=True):
+        """
+        Params:
+            model_source(string): Textual file representing
+                the model.
+            change_state(bool): If True, object's state will
+                be changed.
+
+        Returns:
+            List of syntax errors
+            List of semantic errors
+        """
+        # Return lists
+        syn_errs = []
+        sem_errs = []
+
+        # Parse
+        try:
+            log.debug("Parsing model source: " + model_source)
+            model = self.config.get_mm_by_ext(self.file_ext)\
+                               .model_from_str(model_source)
+
+            # Change object's state
+            if change_state:
+                log.debug("Parsing model. Model is valid. Source: {0}".format(
+                          model_source))
+                self.last_valid_model = model
+
+        except TextXSyntaxError as e:
+            log.debug("Parsing model syntax error: " + str(e))
+            syn_errs.append(e)
+        except TextXSemanticError as e:
+            log.debug("Parsing model semantic error: " + str(e))
+            sem_errs.append(e)
+
+        if change_state:
+            self.syntax_errors = syn_errs
+            self.semantic_errors = sem_errs
+
+        return syn_errs, sem_errs
+
+    @property
+    def is_valid_model(self):
+        return len(list(self.all_errors)) == 0
+
+    @property
+    def all_errors(self):
+        return itertools.chain(self.syntax_errors, self.semantic_errors)
+
+    @property
+    def has_syntax_errors(self):
+        return len(self.syntax_errors)
+
+    @property
+    def has_semantic_errors(self):
+        return len(self.semantic_errors)
+
+    def get_rule_at_position(self, position):
+        """
+        Returns rule at cursor position in model source file
+        """
+        if self.last_valid_model is None:
+            return
+
+        offset = _utils.line_col_to_pos(self.source, position)
+
+        rules_dict = self.last_valid_model._pos_rule_dict
+
+        rule = None
+        for p in rules_dict.keys():
+            if p[1] > offset > p[0]:
+                rule = rules_dict[p]
+                break
+
+        return rule
+
+    def get_all_rules(self):
+        """
+        Concatenate builtins with rule list
+        """
+        builtins = []
+        try:
+            builtins = list(self.config.get_mm_by_ext(
+                                self.file_ext).builtins.values())
+        except:
+            pass
+
+        from_model = list(self.last_valid_model._pos_rule_dict.values())
+        all_rules = from_model + builtins
+        log.debug("Get all rules: " + ','.join(str(r) for r in all_rules))
+        return all_rules

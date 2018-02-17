@@ -11,7 +11,8 @@ from textx.metamodel import metamodel_from_file
 from textx_langserv.utils import uris
 from textx_langserv.utils._utils import flatten
 from textx_langserv.utils.constants import TX_TX_EXTENSION,\
-    TX_CONFIG_EXTENSION, TX_OUTLINE_EXTENSION, TX_COLORING_EXTENSION
+    TX_CONFIG_EXTENSION, TX_OUTLINE_EXTENSION, TX_COLORING_EXTENSION, \
+    TX_METAMODEL, CONFIG_METAMODEL, COLORING_METAMODEL, OUTLINE_METAMODEL
 
 from textx_langserv import LS_ROOT_PATH
 
@@ -36,22 +37,15 @@ class Configuration(object):
                                 classes=classes,
                                 builtins=builtins)
 
-        self.dsls_info = [
-            (['.tx'],       partial(self._loader, 'textx.tx')),
-            (['.txconfig'], partial(self._loader, 'configuration.tx')),
-            (['.txcl'],     partial(self._loader, 'coloring.tx')),
-            (['.txol'],     partial(self._loader, 'outline.tx'))
+        self.languages = [
+            ([TX_TX_EXTENSION], partial(self._loader, 'textx.tx')),
+            ([TX_CONFIG_EXTENSION], partial(self._loader, 'configuration.tx')),
+            ([TX_COLORING_EXTENSION], partial(self._loader, 'coloring.tx')),
+            ([TX_OUTLINE_EXTENSION], partial(self._loader, 'outline.tx'))
         ]
+        self.builtin_lang_len = len(self.languages)
 
         self.load_configuration()
-
-    def _get_mm_loader_by_ext(self, ext):
-        for dsl_exts, mm_loader in self.dsls_info:
-            if ext in dsl_exts:
-                return mm_loader
-
-    def get_mm_by_ext(self, ext):
-        return self._get_mm_loader_by_ext(ext)()
 
     def load_configuration(self):
         try:
@@ -61,6 +55,14 @@ class Configuration(object):
             return True
         except:
             return False
+
+    def _get_mm_loader_by_ext(self, ext):
+        for dsl_exts, mm_loader in self.languages:
+            if ext in dsl_exts:
+                return mm_loader
+
+    def get_mm_by_ext(self, ext):
+        return self._get_mm_loader_by_ext(ext)()
 
     def load_metamodel(self):
         def exec_func_from_module_path(path, module_name):
@@ -78,14 +80,19 @@ class Configuration(object):
         builtins = exec_func_from_module_path(self.builtins_path,
                                               "_custom_builtins")
 
-        self.dsls_info.append((self.language_extensions,
+        self.reset_languages_list()
+        self.languages.append((self.language_extensions,
                                partial(self._loader,
                                        self.grammar_path,
                                        classes,
                                        builtins)))
 
+    def reset_languages_list(self):
+        if len(self.languages) > self.builtin_lang_len:
+            self.languages.pop()
+
     def get_all_extensions(self):
-        return flatten([ext for ext, _ in self.dsls_info])
+        return flatten([ext for ext, _ in self.languages])
 
     @property
     def language_name(self):

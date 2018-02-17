@@ -3,12 +3,13 @@ from textx_langserv.utils._utils import pos_to_line_col
 REFERENCE_TEXT_LENS = "{0} references"
 
 
-def code_lens(model_source, tx_dsl_handler):
+def code_lens(doc_uri, workspace):
 
-    if tx_dsl_handler.is_valid_model:
+    txdoc = workspace.get_document(doc_uri)
+    if txdoc is not None and txdoc.is_valid_model:
         # List of all references in model
 
-        crossref_list = tx_dsl_handler.last_valid_model._pos_crossref_list
+        crossref_list = txdoc.last_valid_model._pos_crossref_list
 
         def count_references(crossref_list):
             # Key: rule name
@@ -27,10 +28,10 @@ def code_lens(model_source, tx_dsl_handler):
                 except:
                     rule_ref_dict[ref.name] = (1,
                                                pos_to_line_col(
-                                                   model_source,
+                                                   txdoc.source,
                                                    ref.def_pos_start),
                                                pos_to_line_col(
-                                                   model_source,
+                                                   txdoc.source,
                                                    ref.def_pos_end
                                                ))
             return rule_ref_dict

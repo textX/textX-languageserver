@@ -18,8 +18,6 @@ from textx_langserv.capabilities.code_lens import code_lens
 
 from textx_langserv.commands import get_commands
 
-from textx_langserv.infrastructure.dsl_handler import TxDslHandler
-
 __author__ = "Daniel Elero"
 __copyright__ = "textX-tools"
 __license__ = "MIT"
@@ -34,8 +32,6 @@ class TextXLanguageServer(LanguageServer):
     """
     workspace = None
     configuration = None
-    dsl_extension = None
-    tx_dsl_handlers = {}
 
     commands = get_commands()
 
@@ -53,21 +49,13 @@ class TextXLanguageServer(LanguageServer):
     def m_text_document__did_close(self, textDocument=None, **_kwargs):
         # Remove document from workspace
         self.workspace.rm_document(textDocument['uri'])
-        # Remove handler from dict
-        del self.tx_dsl_handlers[self.dsl_extension]
 
     def m_text_document__did_open(self, textDocument=None, **_kwargs):
         # Add document to workspace
         self.workspace.put_document(doc_uri=textDocument['uri'],
                                     content=textDocument['text'],
                                     version=textDocument.get('version'))
-        # Add model handler in dict
-        self.tx_dsl_handlers[self.dsl_extension] = \
-            handler = TxDslHandler(self.configuration, self.dsl_extension)
-        # Parse model and lint file
-        self.tx_dsl_handlers[self.dsl_extension] \
-            .parse_model(self.workspace.documents[textDocument['uri']].source)
-        lint(textDocument['uri'], self.workspace, handler)
+        lint(textDocument['uri'], self.workspace)
 
     def m_text_document__did_change(self,
                                     contentChanges=None,
@@ -79,48 +67,29 @@ class TextXLanguageServer(LanguageServer):
                 change,
                 version=textDocument.get('version')
             )
-        handler = self.tx_dsl_handlers[self.dsl_extension]
-        handler.parse_model(
-            self.workspace.documents[textDocument['uri']].source)
-        lint(textDocument['uri'], self.workspace, handler)
+        lint(textDocument['uri'], self.workspace)
 
     def m_text_document__did_save(self, textDocument=None, **_kwargs):
-        handler = self.tx_dsl_handlers[self.dsl_extension]
-        handler.parse_model(
-            self.workspace.documents[textDocument['uri']].source)
-        lint(textDocument['uri'], self.workspace, handler)
+        lint(textDocument['uri'], self.workspace)
 
     def m_text_document__code_action(self, textDocument=None, range=None,
                                      context=None, **_kwargs):
         pass
 
     def m_text_document__code_lens(self, textDocument=None, **_kwargs):
-        handler = self.tx_dsl_handlers[self.dsl_extension]
-        handler.parse_model(
-            self.workspace.documents[textDocument['uri']].source)
-        model_source = self.workspace.get_document(textDocument['uri']).source
-        return code_lens(model_source, handler)
+        return code_lens(textDocument['uri'], self.workspace)
 
     def m_text_document__completion(self, textDocument=None, position=None,
                                     **_kwargs):
-        handler = self.tx_dsl_handlers[self.dsl_extension]
-        handler.parse_model(
-            self.workspace.documents[textDocument['uri']].source)
-        model_source = self.workspace.get_document(textDocument['uri']).source
-        return completions(model_source, position, handler)
+        return completions(textDocument['uri'], self.workspace, position)
 
     def m_text_document__definition(self, textDocument=None, position=None,
                                     **_kwargs):
-        handler = self.tx_dsl_handlers[self.dsl_extension]
-        handler.parse_model(
-            self.workspace.documents[textDocument['uri']].source)
-        return definitions(textDocument['uri'], position, handler)
+        return definitions(textDocument['uri'], self.workspace, position)
 
     def m_text_document__hover(self, textDocument=None, position=None,
                                **_kwargs):
-        handler = self.tx_dsl_handlers[self.dsl_extension]
-        grammar_path = self.configuration.grammar_path
-        return hover(textDocument['uri'], position, handler, grammar_path)
+        return hover()
 
     def m_text_document__document_symbol(self, textDocument=None, **_kwargs):
         pass
@@ -140,41 +109,49 @@ class TextXLanguageServer(LanguageServer):
 
     def m_text_document__references(self, textDocument=None, position=None,
                                     context=None, **_kwargs):
-        handler = self.tx_dsl_handlers[self.dsl_extension]
-        handler.parse_model(
-            self.workspace.documents[textDocument['uri']].source)
-        return find_all_references(textDocument['uri'], position,
-                                   context, handler)
+        return find_all_references(textDocument['uri'], self.workspace,
+                                   position, context)
 
     def m_text_document__signature_help(self, textDocument=None, position=None,
                                         **_kwargs):
         pass
 
     def m_workspace__did_change_configuration(self, settings=None):
-        try:
-            handler = self.tx_dsl_handlers[self.dsl_extension]
-            for doc_uri in self.workspace.documents:
-                lint(doc_uri, self.workspace, handler)
-        except KeyError:
-            pass
+        pass
 
     def m_workspace__did_change_watched_files(self, **_kwargs):
-        handler = self.tx_dsl_handlers[self.dsl_extension]
         for change in _kwargs['changes']:
-            # Check if configuration file is changed
-            if uris.to_fs_path(change['uri']) == \
-                    self.configuration.txconfig_uri:
-                loaded = self.configuration.load_configuration()
-                if loaded:
-                    self.workspace.show_message("You have to reopen your tabs \
-                                                or restart vs code.")
+            path = uris.to_fs_path(change['uri'])
+            # Grammar changed
+            if os.path.samefile(path,
+                                self.configuration.grammar_path):
+                pass
+
+            # Configuration file changed
+            elif os.path.samefile(path,
+                                  self.configuration.txconfig_uri):
+
+                successful = self.configuration.load_configuration()
+                if successful:
+                    exts = self.configuration.language_extensions
+                    msg = "Configuration changed. Please reopen all files\
+                           with \"{}\" extension(s).".format(', '.join(exts))
+                    self.workspace.show_message(msg)
+
+                    self.workspace.remove_by_extension(self.configuration.
+                                                       get_all_extensions())
+                    self.workspace.parse_all()
+                    for doc_uri in self.workspace.documents:
+                        lint(doc_uri, self.workspace)
                 else:
                     self.workspace.show_message("Error in .txconfig file.")
-            # TODO: Check if metamodel is changed
 
-        # Externally changed files may result in changed diagnostics
-        for doc_uri in self.workspace.documents:
-            lint(doc_uri, self.workspace, handler)
+            # Other files
+            else:
+                txdoc = self.workspace.get_document(change['uri'])
+                if txdoc is not None:
+                    txdoc.parse_model(txdoc.source)
+                    lint(change['uri'], self.workspace)
 
     def m_workspace__execute_command(self, command=None, arguments=None):
         try:
@@ -182,3 +159,4 @@ class TextXLanguageServer(LanguageServer):
         except KeyError:
             log.exception("Execute command error.")
             pass
+        pass

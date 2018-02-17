@@ -81,7 +81,6 @@ class MethodJSONRPCServer(JSONRPCServer):
                     if ext not in dsl_extensions:
                         return
 
-                    self.dsl_extension = ext
                 return func(*args, **kwargs)
             except:  # pylint: disable=bare-except
                 log.exception("CAUGHT")

@@ -16,12 +16,12 @@ def get_commands():
 
 def _get_outline_command(textx_ls, args):
     try:
-        handler = textx_ls.tx_dsl_handlers[textx_ls.dsl_extension]
-        if handler is not None:
+        txdoc = textx_ls.workspace.get_document(args[0]['uri']['external'])
+        if txdoc is not None:
             return OutlineTree(
-                    model_source=handler.model_source,
+                    model_source=txdoc.source,
                     outline_model=textx_ls.configuration.outline_model,
-                    current_model=handler.last_valid_model
+                    current_model=txdoc.last_valid_model
                    ).make_tree()
     except:
         pass

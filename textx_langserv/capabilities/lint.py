@@ -13,13 +13,14 @@ LINT_DEBOUNCE_S = 0.5
 
 
 @_utils.debounce(LINT_DEBOUNCE_S)
-def lint(doc_uri, workspace, tx_dsl_handler):
+def lint(doc_uri, workspace):
     """
     Create and return diagnostic object which contains all parsing errors
     """
     if doc_uri in workspace.documents:
         diagnostic = Diagnostic()
-        errors = tx_dsl_handler.all_errors
+        txdoc = workspace.get_document(doc_uri)
+        errors = txdoc.all_errors
         for e in errors:
             msg = str(e)
             try:

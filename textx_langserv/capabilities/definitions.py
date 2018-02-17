@@ -10,7 +10,7 @@ __copyright__ = "textX-tools"
 __license__ = "MIT"
 
 
-def definitions(doc_uri, position, tx_dsl_handler):
+def definitions(doc_uri, workspace, position):
     """
     If cursor position is on the reference to other instance of rule
     Go to definition will place the cursor at the begining of referenced rule
@@ -20,14 +20,16 @@ def definitions(doc_uri, position, tx_dsl_handler):
     - must be in the same file
     - Don't forget builtins
     """
-    if tx_dsl_handler.is_valid_model:
 
-        source = tx_dsl_handler.model_source
+    txdoc = workspace.get_document(doc_uri)
+    if txdoc is not None and txdoc.is_valid_model:
+
+        source = txdoc.source
 
         offset = _utils.line_col_to_pos(source, position)
 
         # List of all references in model
-        crossref_list = tx_dsl_handler.last_valid_model._pos_crossref_list
+        crossref_list = txdoc.last_valid_model._pos_crossref_list
 
         # Find offset that is in range of ref_pos_start and ref_pos_end
         ref_rule = None
@@ -39,7 +41,7 @@ def definitions(doc_uri, position, tx_dsl_handler):
             return
 
         # Get positions for definition of referenced rule
-        st_line, st_col = _utils.pos_to_line_col(source, 
+        st_line, st_col = _utils.pos_to_line_col(source,
                                                  ref_rule.def_pos_start)
         end_line, end_col = _utils.pos_to_line_col(source,
                                                    ref_rule.def_pos_end)
