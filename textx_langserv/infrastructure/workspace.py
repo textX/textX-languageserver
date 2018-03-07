@@ -198,7 +198,7 @@ class TextXDocument(Document):
 
         self.config = config
 
-        self.tx_last_valid_model = None
+        self.last_valid_model = None
         self.tx_syntax_errors = []
         self.tx_semantic_errors = []
 

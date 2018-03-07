@@ -1,0 +1,7 @@
+dsl Workflow [wf] {
+
+	paths {
+		grammar: "workflow/workflow.tx"
+		outline: "workflow/workflow.txol"
+	}
+}

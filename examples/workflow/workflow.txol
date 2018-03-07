@@ -1,0 +1,34 @@
+Workflow {
+	label = name + '( ' + desc + ' )'
+	icon = ""
+}
+
+Init {
+	label = init
+	icon = ""
+}
+
+Task {
+	label = name
+	icon = ""
+}
+
+Entry {
+	label = entry
+	icon = ""
+}
+
+Leave {
+	label = leave
+	icon = ""
+}
+
+Next {
+	label = next
+	icon = ""
+}
+
+Action {
+	label = name
+	icon = ""
+}
