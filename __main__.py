@@ -4,6 +4,16 @@ import logging
 import argparse
 import json
 
+
+def change_environment():
+    site_packs = [p for p in sys.path if 'site-packages' in p]
+    for sp in site_packs:
+        sys.path.remove(sp)
+    sys.path.insert(0, os.path.abspath(os.path.join(__file__,
+                                                    '../third_party')))
+
+change_environment()
+
 from textx_langserv.infrastructure import language_server
 from textx_langserv.infrastructure.textx_ls import TextXLanguageServer
 
