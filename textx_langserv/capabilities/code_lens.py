@@ -12,28 +12,31 @@ def code_lens(doc_uri, workspace):
         crossref_list = txdoc.last_valid_model._pos_crossref_list
 
         def count_references(crossref_list):
-            # Key: rule name
+            # Key: rule name + def position start + def position end
             # Value: (ref count, (def_pos_start_line, def_pos_start_col),
             #                    (def_pos_end_line, def_pos_end_col))
             rule_ref_dict = {}
 
             for ref in crossref_list:
+                key = '{}{}{}'.format(ref.name,
+                                      ref.def_pos_start,
+                                      ref.def_pos_end)
                 try:
                     ref_count, def_pos_start, def_pos_end = \
-                        rule_ref_dict[ref.name]
+                        rule_ref_dict[key]
                     ref_count += 1
-                    rule_ref_dict[ref.name] = (ref_count,
-                                               def_pos_start,
-                                               def_pos_end)
+                    rule_ref_dict[key] = (ref_count,
+                                          def_pos_start,
+                                          def_pos_end)
                 except:
-                    rule_ref_dict[ref.name] = (1,
-                                               pos_to_line_col(
-                                                   txdoc.source,
-                                                   ref.def_pos_start),
-                                               pos_to_line_col(
-                                                   txdoc.source,
-                                                   ref.def_pos_end
-                                               ))
+                    rule_ref_dict[key] = (1,
+                                          pos_to_line_col(
+                                            txdoc.source,
+                                            ref.def_pos_start),
+                                          pos_to_line_col(
+                                            txdoc.source,
+                                            ref.def_pos_end
+                                          ))
             return rule_ref_dict
 
         rule_ref_dict = count_references(crossref_list)
