@@ -6,6 +6,7 @@ from textx_langserv.utils import _utils, uris
 from textx_langserv.infrastructure.language_server import LanguageServer
 from textx_langserv.infrastructure.workspace import Workspace
 from textx_langserv.infrastructure.configuration import Configuration
+from textx_langserv.infrastructure.lsp import MessageType
 
 from textx_langserv.capabilities import get_capabilities
 
@@ -148,7 +149,8 @@ class TextXLanguageServer(LanguageServer):
                         for doc_uri in self.workspace.documents:
                             lint(doc_uri, self.workspace)
                     else:
-                        self.workspace.show_message("Error in .txconfig file.")
+                        self.workspace.show_message("Error in .txconfig file.",
+                                                    MessageType.Error)
             except:
                 pass
 

@@ -75,7 +75,7 @@ class Diagnostic(object):
               severity=None, code=None, source=None):
         range = {
                     'start': {'line': line-1, 'col': col},
-                    'end': {'line': line-1, 'col': col+len(lines[line])}
+                    'end': {'line': line-1, 'col': col+len(lines[line-1])}
                 }
         self.diagnostics.append({
             'range': range,
