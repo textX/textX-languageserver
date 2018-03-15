@@ -45,7 +45,7 @@ RepeatableExpr:
 ;
 
 Expression:
-    assigment=Assignment
+    assignment=Assignment
     |
     (predicate=SyntacticPredicate? (simple_match=SimpleMatch | rule_ref=RuleRef | bracketed_choice=BracketedChoice ))
 ;

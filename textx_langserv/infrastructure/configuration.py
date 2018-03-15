@@ -12,7 +12,8 @@ from textx_langserv.utils import uris
 from textx_langserv.utils._utils import flatten
 from textx_langserv.utils.constants import TX_TX_EXTENSION,\
     TX_CONFIG_EXTENSION, TX_OUTLINE_EXTENSION, TX_COLORING_EXTENSION, \
-    TX_METAMODEL, CONFIG_METAMODEL, COLORING_METAMODEL, OUTLINE_METAMODEL
+    TX_MM, CONFIG_MM, COLORING_MM, OUTLINE_MM, \
+    MM_PATH
 
 from textx_langserv import LS_ROOT_PATH
 
@@ -31,17 +32,17 @@ class Configuration(object):
 
         self._loader = lambda path, classes=[], builtins={}: \
             metamodel_from_file(join(LS_ROOT_PATH,
-                                     'metamodel',
+                                     MM_PATH,
                                      path),
                                 textx_tools_support=True,
                                 classes=classes,
                                 builtins=builtins)
 
         self.languages = [
-            ([TX_TX_EXTENSION], partial(self._loader, 'textx.tx')),
-            ([TX_CONFIG_EXTENSION], partial(self._loader, 'configuration.tx')),
-            ([TX_COLORING_EXTENSION], partial(self._loader, 'coloring.tx')),
-            ([TX_OUTLINE_EXTENSION], partial(self._loader, 'outline.tx'))
+            ([TX_TX_EXTENSION], partial(self._loader, TX_MM)),
+            ([TX_CONFIG_EXTENSION], partial(self._loader, CONFIG_MM)),
+            ([TX_COLORING_EXTENSION], partial(self._loader, COLORING_MM)),
+            ([TX_OUTLINE_EXTENSION], partial(self._loader, OUTLINE_MM))
         ]
         self.builtin_lang_len = len(self.languages)
 

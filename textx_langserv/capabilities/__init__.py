@@ -1,7 +1,7 @@
 from textx_langserv.infrastructure import lsp
 
 
-def get_capabilities():
+def get_capabilities(cmd_list):
     return {
             'codeActionProvider': True,
             'codeLensProvider': {
@@ -17,7 +17,7 @@ def get_capabilities():
             'documentSymbolProvider': True,
             'definitionProvider': True,
             'executeCommandProvider': {
-                'commands': ['genext', 'outline.refresh']
+                'commands': cmd_list
             },
             'hoverProvider': True,
             'referencesProvider': True,

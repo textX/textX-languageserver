@@ -261,7 +261,7 @@ class TextXDocument(Document):
     def has_semantic_errors(self):
         return len(self.semantic_errors)
 
-    def get_rule_at_position(self, position):
+    def get_rule_inst_at_position(self, position):
         """
         Returns rule at cursor position in model source file
         """
@@ -280,7 +280,7 @@ class TextXDocument(Document):
 
         return rule
 
-    def get_all_rules(self):
+    def get_all_rule_instances(self):
         """
         Concatenate builtins with rule list
         """

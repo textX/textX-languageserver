@@ -7,9 +7,12 @@ TX_TX_EXTENSION = '.tx'
 # Commands
 TX_OUTLINE_COMMAND = 'outline.refresh'
 TX_GENEXT_COMMAND = 'generator.vscode'
+TX_METAMODEL_EXPORT_COMMAND = 'dotexport.metamodel'
+TX_MODEL_EXPORT_COMMAND = 'dotexport.model'
 
 # Metamodel file names
-TX_METAMODEL = 'textx.tx'
-CONFIG_METAMODEL = 'configuration.tx'
-COLORING_METAMODEL = 'coloring.tx'
-OUTLINE_METAMODEL = 'outline.tx'
+MM_PATH = 'metamodel'
+TX_MM = 'textx.tx'
+CONFIG_MM = 'configuration.tx'
+COLORING_MM = 'coloring.tx'
+OUTLINE_MM = 'outline.tx'

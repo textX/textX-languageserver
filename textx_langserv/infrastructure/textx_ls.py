@@ -36,7 +36,8 @@ class TextXLanguageServer(LanguageServer):
     commands = get_commands()
 
     def capabilities(self):
-        return get_capabilities()
+        cmd_list = list(self.commands.keys())
+        return get_capabilities(cmd_list)
 
     def initialize(self, root_uri, init_opts, _process_id):
         self.process_id = _process_id
@@ -123,28 +124,33 @@ class TextXLanguageServer(LanguageServer):
         for change in _kwargs['changes']:
             path = uris.to_fs_path(change['uri'])
             # Grammar changed
-            if os.path.samefile(path,
-                                self.configuration.grammar_path):
+            try:
+                if os.path.samefile(path,
+                                    self.configuration.grammar_path):
+                    pass
+
+                # Configuration file changed
+                elif os.path.samefile(path,
+                                      self.configuration.txconfig_uri):
+
+                    successful = self.configuration.load_configuration()
+                    if successful:
+                        exts = self.configuration.language_extensions
+                        msg = "Configuration changed. Please reopen all files\
+                            with \"{}\" extension(s).".format(', '.join(exts))
+                        self.workspace.show_message(msg)
+
+                        self.workspace\
+                            .remove_by_extension(self.configuration.
+                                                 get_all_extensions())
+
+                        self.workspace.parse_all()
+                        for doc_uri in self.workspace.documents:
+                            lint(doc_uri, self.workspace)
+                    else:
+                        self.workspace.show_message("Error in .txconfig file.")
+            except:
                 pass
-
-            # Configuration file changed
-            elif os.path.samefile(path,
-                                  self.configuration.txconfig_uri):
-
-                successful = self.configuration.load_configuration()
-                if successful:
-                    exts = self.configuration.language_extensions
-                    msg = "Configuration changed. Please reopen all files\
-                           with \"{}\" extension(s).".format(', '.join(exts))
-                    self.workspace.show_message(msg)
-
-                    self.workspace.remove_by_extension(self.configuration.
-                                                       get_all_extensions())
-                    self.workspace.parse_all()
-                    for doc_uri in self.workspace.documents:
-                        lint(doc_uri, self.workspace)
-                else:
-                    self.workspace.show_message("Error in .txconfig file.")
 
             # Other files
             else:

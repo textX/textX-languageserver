@@ -1,6 +1,9 @@
-from textx_langserv.utils.constants import TX_OUTLINE_COMMAND
+from textx_langserv.utils.constants import TX_OUTLINE_COMMAND, \
+    TX_METAMODEL_EXPORT_COMMAND, TX_MODEL_EXPORT_COMMAND
 
 from textx_langserv.commands.outline import OutlineTree
+from textx_langserv.commands.dotexport import dotexport_metamodel_cmd, \
+    dotexport_model_cmd
 
 
 def get_commands():
@@ -10,7 +13,9 @@ def get_commands():
         Be sure that command is registered in capabilities
     """
     return {
-        TX_OUTLINE_COMMAND: _get_outline_command
+        TX_OUTLINE_COMMAND: _get_outline_command,
+        TX_METAMODEL_EXPORT_COMMAND: dotexport_metamodel_cmd,
+        TX_MODEL_EXPORT_COMMAND: dotexport_model_cmd
     }
 
 

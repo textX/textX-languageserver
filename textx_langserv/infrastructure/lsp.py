@@ -71,10 +71,11 @@ class Diagnostic(object):
     def __init__(self):
         self.diagnostics = []
 
-    def error(self, line, col, message, severity=None, code=None, source=None):
+    def error(self, lines, line, col, message,
+              severity=None, code=None, source=None):
         range = {
                     'start': {'line': line-1, 'col': col},
-                    'end': {'line': line-1, 'col': col+1}
+                    'end': {'line': line-1, 'col': col+len(lines[line])}
                 }
         self.diagnostics.append({
             'range': range,

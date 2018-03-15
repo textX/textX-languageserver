@@ -22,7 +22,7 @@ def find_all_references(doc_uri, workspace, position, context):
         # List of all references in model
         crossref_list = txdoc.last_valid_model._pos_crossref_list
 
-        rule = txdoc.get_rule_at_position(position)
+        rule = txdoc.get_rule_inst_at_position(position)
 
         all_references = []
         for ref_rule in crossref_list:

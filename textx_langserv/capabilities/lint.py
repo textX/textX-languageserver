@@ -22,11 +22,11 @@ def lint(doc_uri, workspace):
         txdoc = workspace.get_document(doc_uri)
         errors = txdoc.all_errors
         for e in errors:
-            msg = str(e)
             try:
+                msg = e.args[0].decode("utf-8")
                 msg = msg.split(' at')[0]
-                diagnostic.error(e.line, e.col, msg)
+                diagnostic.error(txdoc.lines, e.line, e.col, msg)
             except:
-                diagnostic.error(e.line, e.col, msg)
+                diagnostic.error(txdoc.lines, e.line, e.col, str(e))
 
         workspace.publish_diagnostics(doc_uri, diagnostic.get_diagnostics())
