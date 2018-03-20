@@ -102,3 +102,5 @@ ENV/
 
 # Third party libraries
 third_party
+*.dot
+*.idea

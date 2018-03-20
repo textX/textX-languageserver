@@ -1,34 +1,34 @@
 Workflow {
 	label = name + '( ' + desc + ' )'
-	icon = ""
+	icon = "examples\\workflow\\icons\\workflow.png"
 }
 
 Init {
 	label = init
-	icon = ""
+	icon = "examples\\workflow\\icons\\init.png"
 }
 
 Task {
 	label = name
-	icon = ""
+	icon = "examples\\workflow\\icons\\task.png"
 }
 
 Entry {
 	label = entry
-	icon = ""
+	icon = "examples\\workflow\\icons\\entry.png"
 }
 
 Leave {
 	label = leave
-	icon = ""
+	icon = "examples\\workflow\\icons\\leave.png"
 }
 
 Next {
 	label = next
-	icon = ""
+	icon = "examples\\workflow\\icons\\next.png"
 }
 
 Action {
 	label = name
-	icon = ""
+	icon = "examples\\workflow\\icons\\action.png"
 }

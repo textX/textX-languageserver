@@ -16,7 +16,7 @@ from textx_langserv.utils.uris import to_fs_path
 from textx_langserv import EXTENSION_ROOT_PATH
 from textx_langserv.utils.constants import SERVER_TCP
 
-from textx_langserv.generators.vscode.coloring import get_coloring_model
+from textx_langserv.generators.vscode.coloring import ColoringVSCode
 
 this_folder = dirname(__file__)
 
@@ -30,7 +30,7 @@ def generate(textx_ls, args):
         errors = validate_config_file(textx_ls)
         if errors:
             msg = "Missing fields in .txconfig file.\n{}"\
-                  .format('\n'.join(errors))
+                    .format('\n'.join(errors))
             textx_ls.workspace.show_message(msg)
             return
 
@@ -39,7 +39,7 @@ def generate(textx_ls, args):
         textx_ls.workspace.show_message(msg)
 
         env = Environment(loader=FileSystemLoader(join(this_folder,
-                                                  'templates')),
+                                                       'templates')),
                           trim_blocks=True,
                           lstrip_blocks=True)
 
@@ -55,7 +55,8 @@ def generate(textx_ls, args):
         textx_ls.workspace.show_message(msg)
 
     except:
-        pass
+        msg = "Generating failed."
+        textx_ls.workspace.show_message(msg)
     finally:
         textx_ls.gen_cmd_finished = True
 
@@ -76,8 +77,9 @@ def generate_tm_coloring_json(gen_path, textx_ls, env):
     template = env.get_template('coloring_json.template')
     lang_name = textx_ls.configuration.language_name
     coloring_file_name = lang_name.lower() + '.tmLanguage.json'
+    coloring = ColoringVSCode(textx_ls.configuration)
     with open(join(gen_path, 'syntaxes', coloring_file_name), 'w') as f:
-        f.write(template.render(test=get_coloring_model(textx_ls)))
+        f.write(template.render(coloring.get_coloring_model()))
 
 
 def validate_config_file(textx_ls):

@@ -200,15 +200,20 @@ class Configuration(object):
             pass
 
     @property
-    def textx_metamodel(self):
-        textx_mm = self.get_mm_by_ext(TX_TX_EXTENSION)
-        return textx_mm
-
-    @property
     def lang_metamodel(self):
         try:
             lang_mm = self.get_mm_by_ext(self.language_extensions[0])
             return lang_mm
+        except:
+            pass
+
+    @property
+    def grammar_model(self):
+        try:
+            textx_mm = self.get_mm_by_ext(TX_TX_EXTENSION)
+            path = self.grammar_path
+            return textx_mm.model_from_file(
+                join(uris.to_fs_path(self.root_uri), path))
         except:
             pass
 

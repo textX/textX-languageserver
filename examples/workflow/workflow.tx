@@ -1,5 +1,6 @@
 
 /* Simple workflow language. */
+
 Program:
   workflow = Workflow
   init = Init

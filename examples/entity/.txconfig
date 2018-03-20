@@ -1,0 +1,18 @@
+dsl entity [ent] {
+	general {
+		publisher: "FTN"
+		author: "Nemanja Starcev"
+        url: "http:\\github.com"
+		version: "1.0.0"
+    }
+
+	paths {
+		grammar: "examples\\entity\\entity.tx"
+		outline: "examples\\entity\\entity.txol"
+		coloring: "examples\\entity\\entity.txcl"
+	}
+
+	python {
+	    interpreter: "C:\\Users\\Nemanja\\AppData\\Local\\Programs\\Python\\Python36-32\\python.exe"
+	}
+}

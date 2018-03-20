@@ -1,19 +1,19 @@
 Coloring:
-	configuration=Configuration? rules*=Rule
+	configuration = Configuration? array *= Array
 ;
 
-Rule:
-	rules=Rules | matches=Matches | regular_expressions = RegularExpressions
+Array:
+	rules = Rules | matches = Matches | regular_expressions = RegularExpressions
 ;
 
 Configuration:
-	'configuration' '=' '{' configuration_commands *= ConfigurationCommand '}'
+	'configuration' '{' configuration_commands *= ConfigurationCommand '}'
 ;
 
 ConfigurationCommand:
-	default=Default | coment=Coment
+	default = Default | lang_comment = LangComment
 ;
-	
+
 Default:
 	'default' ':' default_options += DefaultOption
 ;
@@ -23,63 +23,63 @@ DefaultOption:
 ;
 
 DefaultKeyword:
-	'keyword' '->' type=Type ';'
+	'keyword' '=' type=Type ';'
 ;
 
 DefaultOperation:
-	'operation' '->' type=Type ';'
+	'operation' '=' type=Type ';'
 ;
 
-Coment:
-	'comment' ':' comment_options+=CommentOption
+LangComment:
+	'comment' ':' comment_options += CommentOption
 ;
 
 CommentOption:
-	line=Line | block=Block
+	line = Line | block = Block
 ;
 
 Line:
-	'line' ':' id=STRING ';'
+	'line' '=' id=STRING ';'
 ;
 
 Block:
-	'block' ':' 'start' ':' start=STRING ';' 'end' ':' end=STRING ';'
+	'block' ':' 'start' '=' start=STRING ';' 'end' '=' end=STRING ';'
 ;
 
 Rules:
-	'rules' '=' '{' rule_options*=RuleOption '}'
+	'rules' '{' rule_options *= RuleOption '}'
 ;
 
 RuleOption:
-	rule_keyword=RuleKeyword | rule_operation=RuleOperation
+	rule_keyword = RuleKeyword | rule_operation = RuleOperation
 ;
 
 RuleKeyword:
-	'keyword' ':' rule_lists+=RuleList
+	'keyword' ':' rule_lists += RuleList
 ;
 
 RuleOperation:
-	'operation' ':' rule_lists+=RuleList
+	'operation' ':' rule_lists += RuleList
 ;
 
 RuleList:
-	elements+=ID[','] '->' type=Type ';'
+	elements+=ID[','] '=' type=Type ';'
 ;
 
 Matches:
-	'matches' '=' '{' match_list*=MatchList '}'
+	'matches' '{' match_list *= MatchList '}'
 ;
 
 MatchList:
-	words*=STRING[','] '->' type=Type ';'
+	words*=STRING[','] '=' type=Type ';'
 ;
 
 RegularExpressions:
-	'regular' 'expressions' '=' '{' regular_expression_list *= RegularExpressionList '}'
+	'regular' 'expressions' '{' regular_expression_list *= RegularExpressionList '}'
 ;
 
 RegularExpressionList:
-	expression*=STRING[','] '->' type=Type ';'
+	expression*=STRING[','] '=' type=Type ';'
 ;
 
 Type:

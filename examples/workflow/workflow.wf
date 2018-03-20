@@ -6,7 +6,7 @@ init Task1
 
 task Task1 {
   entry A1
-  next Task2, Task3, Task4
+  next Task2, Task3
 }
 
 task Task2 {
@@ -21,9 +21,6 @@ task Task4 {
   entry A2
 }
 
-
-
 action A1
 action A2
 action A3
-

@@ -1,0 +1,11 @@
+type string
+entity Person {
+  name : string  
+  address: Address
+}                    
+
+entity Address {
+  street : string
+  city : string
+  country : string
+}

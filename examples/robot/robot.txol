@@ -1,0 +1,9 @@
+InitialCommand {
+	label = initial
+	icon = "examples\\robot\\icons\\init.png"
+}
+
+MoveCommand {
+	label = direction
+	icon = "examples\\robot\\icons\\direction.png"
+}

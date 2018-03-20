@@ -1,2 +1,126 @@
-TODO: starcev - Create Coloring Template here
-{{test}}
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "{{name|lower}}",
+	"scopeName": "source.{{name|lower}}",
+	"fileTypes": {{ extensions }},
+	"patterns": [
+				{%- if comment.line != None or (comment.block_start != None and comment.block_end != None) %}
+				{
+					"include": "#comment"
+				},
+				{%- endif %}
+				{
+					"include": "#string"
+				},
+				{
+					"include": "#number"
+				},
+				{
+					"include": "#language_keyword"
+				},
+				{
+					"include": "#language_operation"
+				},
+				{
+					"include": "#regular_expression"
+				}
+				],
+                "repository": {
+                    {%- if comment.line != None or (comment.block_start != None and comment.block_end != None) %}
+					"comment": {
+						"patterns": [
+						            {%- if comment.line != None %}
+									{
+										"name": "comment.line",
+										"match": "{{comment.line}}.*$"
+									},
+									{%- endif %}
+									{%- if comment.block_start != None and comment.block_end != None %}
+									{
+										"name": "comment.block",
+										"begin": "{{comment.block_start}}",
+										"end": "{{comment.block_end}}"
+									}
+									{%- endif %}
+									]
+					},
+					{%- endif %}
+					"string": {
+						"patterns": [
+									{
+										"name": "string.quoted.single",
+										"begin": "'",
+										"end": "'"
+									},
+									{
+										"name": "string.quoted.double",
+										"begin": "\"",
+										"end": "\""
+									}
+									]
+					},
+					"number": {
+						"patterns": [
+									{
+										"name": "constant.numeric",
+										"match": "\\b[0-9]+\\b\\.{0,1}"
+									}
+									]
+					},
+					"language_keyword": {
+						"patterns": [
+									{%- for keyword in keywords %}
+									{
+										"name": "{{keyword.name}}",
+										"match": "{{keyword.match}}"
+									}
+									{%- if loop.index != keywords|length -%}
+									,
+									{%- endif %}
+									{%- endfor %}
+									]
+					},
+					"language_operation": {
+						"patterns": [
+									{%- for operation in operations %}
+									{
+										"name": "{{operation.name}}",
+										"match": "{{operation.match}}"
+									}
+									{%- if loop.index != operations|length -%}
+									,
+									{%- endif %}
+									{%- endfor %}
+									]
+					},
+					"regular_expression": {
+						"patterns": [
+									{%- for expression in regular_expressions %}
+									{
+										"name": "{{expression.name}}",
+										"match": "({{expression.match}})",
+                                        "captures": {
+                                            "1": {
+                                                "patterns": [
+                                                    {%- for operation in operations %}
+                                                    {
+                                                        "name": "{{operation.name}}",
+                                                        "match": "{{operation.match}}"
+                                                    }
+                                                    {%- if loop.index != operations|length -%}
+                                                    ,
+                                                    {%- endif %}
+                                                    {%- endfor %}
+                                                ]
+                                            }
+                                        }
+
+									}
+									{%- if loop.index != regular_expressions|length -%}
+									,
+									{%- endif %}
+									{%- endfor %}
+									]
+					}
+				}
+}

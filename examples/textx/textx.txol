@@ -1,0 +1,4 @@
+TextxRule {
+	label = name
+	icon = "examples\\textx\\icons\\rule.png"
+}
