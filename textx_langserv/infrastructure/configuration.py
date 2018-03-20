@@ -26,8 +26,7 @@ class Configuration(object):
 
     def __init__(self, root_uri):
         self.root_uri = root_uri
-        self.txconfig_uri = join(uris.to_fs_path(root_uri),
-                                 TX_CONFIG_EXTENSION)
+        self.txconfig_uri = join(root_uri, TX_CONFIG_EXTENSION)
         self.config_model = None
 
         self._loader = lambda path, classes=[], builtins={}: \
@@ -101,23 +100,59 @@ class Configuration(object):
 
     @property
     def language_extensions(self):
-        return ['.' + ext for ext in self.config_model.extensions]
+        return ['.{}'.format(ext) for ext in self.config_model.extensions]
+
+    @property
+    def lang_ext_double_quoted(self):
+        import json
+        return json.dumps(self.language_extensions)
 
     @property
     def publisher(self):
-        return self.config_model.general_section.publisher
+        try:
+            return self.config_model.general_section.publisher
+        except:
+            pass
 
     @property
-    def url(self):
-        return self.config_model.general_section.url
+    def repo_type(self):
+        try:
+            return self.config_model.general_section.repo_type
+        except:
+            pass
+
+    @property
+    def repo_url(self):
+        try:
+            return self.config_model.general_section.repo_url
+        except:
+            pass
 
     @property
     def author(self):
-        return self.config_model.general_section.author
+        try:
+            return self.config_model.general_section.author
+        except:
+            pass
 
     @property
     def version(self):
-        return self.config_model.general_section.version
+        try:
+            return self.config_model.general_section.version
+        except:
+            pass
+
+    @property
+    def description(self):
+        try:
+            return self.config_model.general_section.description
+        except:
+            pass
+
+    @property
+    def generate_path(self):
+        path = self.config_model.paths_section.generate_path
+        return to_fs_path(self.root_uri, path)
 
     @property
     def grammar_path(self):
@@ -146,10 +181,23 @@ class Configuration(object):
 
     @property
     def outline_model(self):
-        outline_mm = self.get_mm_by_ext(TX_OUTLINE_EXTENSION)
-        path = self.outline_path
-        return outline_mm.model_from_file(
-            join(uris.to_fs_path(self.root_uri), path))
+        try:
+            outline_mm = self.get_mm_by_ext(TX_OUTLINE_EXTENSION)
+            path = self.outline_path
+            return outline_mm.model_from_file(
+                join(uris.to_fs_path(self.root_uri), path))
+        except:
+            pass
+
+    @property
+    def coloring_model(self):
+        try:
+            coloring_mm = self.get_mm_by_ext(TX_COLORING_EXTENSION)
+            path = self.coloring_path
+            return coloring_mm.model_from_file(
+                join(uris.to_fs_path(self.root_uri), path))
+        except:
+            pass
 
 
 def to_fs_path(root_uri, path):
@@ -163,4 +211,4 @@ def to_fs_path(root_uri, path):
     if is_abs:
         return path
     else:
-        return join(uris.to_fs_path(root_uri), path)
+        return join(root_uri, path)

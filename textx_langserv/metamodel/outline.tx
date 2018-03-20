@@ -21,3 +21,16 @@ Name:
 Icon:
 	'icon' '=' path=STRING
 ;
+
+// Comments
+Comment:
+    CommentLine | CommentBlock
+;
+
+CommentLine:
+    /\/\/.*?$/
+;
+
+CommentBlock:
+    /\/\*(.|\n)*?\*\//
+;

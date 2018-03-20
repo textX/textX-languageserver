@@ -9,7 +9,10 @@ def code_lens(doc_uri, workspace):
     if txdoc is not None and txdoc.is_valid_model:
         # List of all references in model
 
-        crossref_list = txdoc.last_valid_model._pos_crossref_list
+        try:
+            crossref_list = txdoc.last_valid_model._pos_crossref_list
+        except:
+            return
 
         def count_references(crossref_list):
             # Key: rule name + def position start + def position end

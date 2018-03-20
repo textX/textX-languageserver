@@ -1,3 +1,12 @@
-X:
-    name=ID
+// Comments
+Comment:
+    CommentLine | CommentBlock
+;
+
+CommentLine:
+    /\/\/.*?$/
+;
+
+CommentBlock:
+    /\/\*(.|\n)*?\*\//
 ;

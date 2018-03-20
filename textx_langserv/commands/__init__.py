@@ -1,9 +1,13 @@
 from textx_langserv.utils.constants import TX_OUTLINE_COMMAND, \
-    TX_METAMODEL_EXPORT_COMMAND, TX_MODEL_EXPORT_COMMAND
+    TX_METAMODEL_EXPORT_COMMAND, TX_MODEL_EXPORT_COMMAND, \
+    TX_VSCODE_GENEXT_COMMAND
 
 from textx_langserv.commands.outline import OutlineTree
 from textx_langserv.commands.dotexport import dotexport_metamodel_cmd, \
     dotexport_model_cmd
+from textx_langserv.generators.vscode import vscode_generator
+
+from threading import Thread
 
 
 def get_commands():
@@ -15,7 +19,8 @@ def get_commands():
     return {
         TX_OUTLINE_COMMAND: _get_outline_command,
         TX_METAMODEL_EXPORT_COMMAND: dotexport_metamodel_cmd,
-        TX_MODEL_EXPORT_COMMAND: dotexport_model_cmd
+        TX_MODEL_EXPORT_COMMAND: dotexport_model_cmd,
+        TX_VSCODE_GENEXT_COMMAND: _generate_vscode_ext_command
     }
 
 
@@ -30,3 +35,13 @@ def _get_outline_command(textx_ls, args):
                    ).make_tree()
     except:
         pass
+
+
+def _generate_vscode_ext_command(textx_ls, args):
+    if textx_ls.gen_cmd_finished:
+        thread = Thread(target=vscode_generator.generate,
+                        args=(textx_ls, args, ))
+        thread.start()
+    else:
+        msg = "You have already started generating."
+        textx_ls.workspace.show_message(msg)

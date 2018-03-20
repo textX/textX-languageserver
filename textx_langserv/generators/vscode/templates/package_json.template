@@ -1,0 +1,143 @@
+{
+	"name": "{{config.language_name|lower}}",
+	"description": "{{config.description}}",
+	"author": "{{config.author}}",
+	"version": "{{config.version}}",
+	"publisher": "{{config.publisher}}",
+	"repository": {
+		"type": "{{config.repo_url}}",
+		"url": "{{config.repo_url}}"
+	},
+	"engines": {
+		"vscode": "^1.20.0"
+	},
+	"categories": [
+		"Languages"
+	],
+	"activationEvents": [
+		"onLanguage:{{config.language_name|lower}}"
+	],
+	"main": "./out/extension",
+	"contributes": {
+		"languages": [
+			{
+				"id": "{{config.language_name|lower}}",
+				"extensions": {{config.lang_ext_double_quoted}},
+				"configuration": "./language-configuration.json"
+			},
+			{
+				"id": "textx",
+				"aliases": [
+					"textx",
+					"textX"
+				],
+				"extensions": [
+					".tx"
+				],
+				"configuration": "./language-configuration.json"
+			},
+			{
+				"id": "txcolor",
+				"extensions": [
+					".txcl"
+				],
+				"configuration": "./language-configuration.json"
+			},
+			{
+				"id": "txoutline",
+				"extensions": [
+					".txol"
+				],
+				"configuration": "./language-configuration.json"
+			},
+			{
+				"id": "txconfig",
+				"extensions": [
+					".txconfig"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "{{config.language_name|lower}}",
+				"scopeName": "source.{{config.language_name|lower}}",
+				"path": "./syntaxes/{{config.language_name|lower}}.tmLanguage.json"
+			},
+			{
+				"language": "textx",
+				"scopeName": "source.textx",
+				"path": "./syntaxes/textx.tmLanguage.json"
+			},
+			{
+				"language": "txconfig",
+				"scopeName": "source.txconfig",
+				"path": "./syntaxes/config.tmLanguage.json"
+			},
+			{
+				"language": "txcolor",
+				"scopeName": "source.txcolor",
+				"path": "./syntaxes/coloring.tmLanguage.json"
+			},
+			{
+				"language": "txoutline",
+				"scopeName": "source.txoutline",
+				"path": "./syntaxes/outline.tmLanguage.json"
+			}
+		],
+		"themes": [
+			{
+				"label": "textXDark",
+				"uiTheme": "vs-dark",
+				"path": "./themes/textXDark-color-theme.json"
+			}
+		],
+		"commands": [
+			{
+				"command": "generator.vscode",
+				"title": "Generate vscode extension"
+			},
+			{
+				"command": "dotexport.metamodel",
+				"title": "Export metamodel to dot"
+			},
+			{
+				"command": "dotexport.model",
+				"title": "Export model to dot"
+			}
+		],
+		"views": {
+			"explorer": [
+				{
+					"id": "codeOutline",
+					"name": "Code Outline"
+				}
+			]
+		},
+		"snippets": [
+			{
+				"language": "txconfig",
+				"path": "./snippets/txconfig.json"
+			},
+			{
+				"language": "txoutline",
+				"path": "./snippets/txoutline.json"
+			}
+		]
+	},
+	"scripts": {
+		"update-vscode": "node ./node_modules/vscode/bin/install",
+		"vscode": "npm run vscode:prepublish && VSCODE=$(which code-insiders || which code || echo echo ERROR: neither the code nor code-insiders vscode executable is installed); USER=dummy-dont-share-vscode-instance $VSCODE --user-data-dir=$PWD/.vscode-dev/user-data --extensionHomePath=$PWD/.vscode-dev/extensions --extensionDevelopmentPath=$PWD $*"
+	},
+	"devDependencies": {
+		"typescript": "^2.1.5",
+		"vscode": "^1.1.5",
+		"mocha": "^2.3.3",
+		"@types/node": "^6.0.40",
+		"@types/mocha": "^2.2.32"
+	},
+	"dependencies": {
+		"portfinder": "^1.0.13",
+		"vscode-languageclient": "^4.0.0"
+	}
+}

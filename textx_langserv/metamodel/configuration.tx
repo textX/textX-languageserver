@@ -7,10 +7,12 @@ Program:
 
 GeneralSection:
 	'general' '{'
-		('publisher' ':'	publisher=STRING)?
-		('author' 	 ':'	author=STRING)?
-		('url' 	     ':'	url=STRING)?
-		('version' 	 ':'	version=STRING)?
+		('publisher'   ':'	publisher=STRING)?
+		('author' 	   ':'	author=STRING)?
+		('repo_type'   ':'  repo_type=STRING)?
+		('repo_url'    ':'	repo_url=STRING)?
+		('version' 	   ':'	version=STRING)?
+		('description' ':'	description=STRING)?
 	'}'
 ;
 
@@ -21,6 +23,19 @@ PathsSection:
 		('coloring'	':'	coloring_path=STRING)?
 		('classes'	':' classes_path=STRING)?
 		('builtins'	':' builtins_path=STRING)?
-
+		('generate' ':' generate_path=STRING)?
 	'}'
+;
+
+// Comments
+Comment:
+    CommentLine | CommentBlock
+;
+
+CommentLine:
+    /\/\/.*?$/
+;
+
+CommentBlock:
+    /\/\*(.|\n)*?\*\//
 ;

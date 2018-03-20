@@ -196,3 +196,16 @@ Type:
 	"variable.parameter" |
 	"variable"
 ;
+
+// Comments
+Comment:
+    CommentLine | CommentBlock
+;
+
+CommentLine:
+    /\/\/.*?$/
+;
+
+CommentBlock:
+    /\/\*(.|\n)*?\*\//
+;

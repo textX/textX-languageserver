@@ -2,14 +2,18 @@ import logging
 import hashlib
 import os
 
+from os.path import join
+
+from textx_langserv.utils.constants import SERVER_TYPE, SERVER_CONNECTION,\
+    SERVER_GENERAL, SERVER_PIPES, SERVER_TCP
 from textx_langserv.utils import _utils, uris
+
 from textx_langserv.infrastructure.language_server import LanguageServer
 from textx_langserv.infrastructure.workspace import Workspace
 from textx_langserv.infrastructure.configuration import Configuration
 from textx_langserv.infrastructure.lsp import MessageType
 
 from textx_langserv.capabilities import get_capabilities
-
 from textx_langserv.capabilities.completions import completions
 from textx_langserv.capabilities.lint import lint
 from textx_langserv.capabilities.hover import hover
@@ -18,6 +22,8 @@ from textx_langserv.capabilities.find_references import find_all_references
 from textx_langserv.capabilities.code_lens import code_lens
 
 from textx_langserv.commands import get_commands
+
+from textx_langserv import LS_ROOT_PATH
 
 __author__ = "Daniel Elero"
 __copyright__ = "textX-tools"
@@ -43,10 +49,20 @@ class TextXLanguageServer(LanguageServer):
     def initialize(self, root_uri, init_opts, _process_id):
         self.process_id = _process_id
         self.root_uri = root_uri
-        self.init_opts = init_opts
+
+        self.server_type = init_opts[SERVER_TYPE]
+        self.server_connection = init_opts[SERVER_CONNECTION]
+
+        self.gen_cmd_finished = True
 
         self.workspace = Workspace(root_uri, self)
-        self.configuration = Configuration(root_uri)
+
+        # Change config uri for generated extensions
+        config_root_uri = uris.to_fs_path(root_uri)
+        if self.server_type != SERVER_GENERAL:
+            config_root_uri = join(LS_ROOT_PATH, 'txconfig')
+
+        self.configuration = Configuration(config_root_uri)
 
     def m_text_document__did_close(self, textDocument=None, **_kwargs):
         # Remove document from workspace
