@@ -199,6 +199,19 @@ class Configuration(object):
         except:
             pass
 
+    @property
+    def textx_metamodel(self):
+        textx_mm = self.get_mm_by_ext(TX_TX_EXTENSION)
+        return textx_mm
+
+    @property
+    def lang_metamodel(self):
+        try:
+            lang_mm = self.get_mm_by_ext(self.language_extensions[0])
+            return lang_mm
+        except:
+            pass
+
 
 def to_fs_path(root_uri, path):
     """
