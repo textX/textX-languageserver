@@ -302,8 +302,8 @@ class ColoringVSCode(object):
                 while j < len(words):
                     if j >= len(words):
                         break
-                    indipendent = self._is_word_indipendent(words[j], item, map)
-                    if indipendent is False:
+                    independent = self._is_word_indep(words[j], item, map)
+                    if independent is False:
                         j = j + 1
                         continue
                     string = ""
@@ -326,7 +326,7 @@ class ColoringVSCode(object):
                     keywords.append(keyword)
         return keywords
 
-    def _is_word_indipendent(self, word, type, map):
+    def _is_word_indep(self, word, type, map):
         for key, value in map.items():
             for item in value:
                 if key != type and word in item:
