@@ -152,32 +152,32 @@ class Configuration(object):
     @property
     def generate_path(self):
         path = self.config_model.paths_section.generate_path
-        return to_fs_path(self.root_uri, path)
+        return uris.to_abs_path(self.root_uri, path)
 
     @property
     def grammar_path(self):
         path = self.config_model.paths_section.grammar_path
-        return to_fs_path(self.root_uri, path)
+        return uris.to_abs_path(self.root_uri, path)
 
     @property
     def coloring_path(self):
         path = self.config_model.paths_section.coloring_path
-        return to_fs_path(self.root_uri, path)
+        return uris.to_abs_path(self.root_uri, path)
 
     @property
     def outline_path(self):
         path = self.config_model.paths_section.outline_path
-        return to_fs_path(self.root_uri, path)
+        return uris.to_abs_path(self.root_uri, path)
 
     @property
     def classes_path(self):
         path = self.config_model.paths_section.classes_path
-        return to_fs_path(self.root_uri, path)
+        return uris.to_abs_path(self.root_uri, path)
 
     @property
     def builtins_path(self):
         path = self.config_model.paths_section.builtins_path
-        return to_fs_path(self.root_uri, path)
+        return uris.to_abs_path(self.root_uri, path)
 
     @property
     def outline_model(self):
@@ -216,17 +216,3 @@ class Configuration(object):
                 join(uris.to_fs_path(self.root_uri), path))
         except:
             pass
-
-
-def to_fs_path(root_uri, path):
-    """
-    Handle relative and absolute paths
-    """
-    if path.isspace():
-        return None
-
-    is_abs = os.path.isabs(path)
-    if is_abs:
-        return path
-    else:
-        return join(root_uri, path)

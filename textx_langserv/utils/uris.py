@@ -129,3 +129,17 @@ def _normalize_win_path(path):
         path = path[0] + path[1].lower() + path[2:]
 
     return path, netloc
+
+
+def to_abs_path(root_uri, path):
+    """
+    Handle relative and absolute paths
+    """
+    if path.isspace():
+        return None
+
+    is_abs = os.path.isabs(path)
+    if is_abs:
+        return path
+    else:
+        return os.path.join(root_uri, path)

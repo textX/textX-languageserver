@@ -2,7 +2,11 @@
 This module is responsible for creating and returning
 outline tree data.
 """
+import os
+from os.path import join, dirname
+
 from textx_langserv.utils._utils import pos_to_line_col
+from textx_langserv.utils.uris import to_abs_path
 from json import JSONEncoder
 
 __author__ = "Nemanja Starčev"
@@ -36,6 +40,7 @@ class OutlineTree(object):
     def __init__(self, model_source, outline_model, current_model):
         self.model_source = model_source
         self.outline_model = outline_model
+        self.outline_path = dirname(outline_model._tx_filename)
         self.nodes = []
         self.start_position_in_lines = []
         self.visit_rule(current_model)
@@ -76,7 +81,8 @@ class OutlineTree(object):
                     label = self.get_label(values, outline_rule.label.names)
                 icon = None
                 if outline_rule.icon is not None:
-                    icon = outline_rule.icon.path
+                    icon = to_abs_path(self.outline_path,
+                                       outline_rule.icon.path)
                 start_line, start_point_in_line = pos_to_line_col(
                                                     self.model_source,
                                                     rule._tx_position)
