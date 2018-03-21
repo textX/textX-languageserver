@@ -1,34 +1,34 @@
 Workflow {
 	label = name + '( ' + desc + ' )'
-	icon = "examples\\workflow\\icons\\workflow.png"
+	icon = "icons/workflow.png"
 }
 
 Init {
 	label = init
-	icon = "examples\\workflow\\icons\\init.png"
+	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\init.png"
 }
 
 Task {
 	label = name
-	icon = "examples\\workflow\\icons\\task.png"
+	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\task.png"
 }
 
 Entry {
 	label = entry
-	icon = "examples\\workflow\\icons\\entry.png"
+	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\entry.png"
 }
 
 Leave {
 	label = leave
-	icon = "examples\\workflow\\icons\\leave.png"
+	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\leave.png"
 }
 
 Next {
 	label = next
-	icon = "examples\\workflow\\icons\\next.png"
+	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\next.png"
 }
 
 Action {
 	label = name
-	icon = "examples\\workflow\\icons\\action.png"
+	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\action.png"
 }

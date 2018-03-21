@@ -1,18 +1,13 @@
-dsl workflow [wf] {
-	general {
-		publisher: "FTN"
-		author: "Nemanja Starcev"
-        url: "http:\\github.com"
-		version: "1.0.0"
-    }
+dsl Workflow [wf] {
 
-	paths {
-		grammar: "examples\\workflow\\workflow.tx"
-		outline: "examples\\workflow\\workflow.txol"
-		coloring: "examples\\workflow\\workflow.txcl"
+	general {
+		publisher: "test"
+		version: "0.0.1"
 	}
 
-	python {
-	    interpreter: "C:\\Users\\Nemanja\\AppData\\Local\\Programs\\Python\\Python36-32\\python.exe"
+	paths {
+		grammar: "workflow/workflow.tx"
+		outline: "workflow/workflow.txol"
+		coloring: "workflow/workflow.txcl"
 	}
 }

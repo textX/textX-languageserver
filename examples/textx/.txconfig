@@ -1,18 +1,8 @@
-dsl textx [tx] {
-	general {
-		publisher: "FTN"
-		author: "Nemanja Starcev"
-        url: "http:\\github.com"
-		version: "1.0.0"
-    }
+dsl textX [tx] {
 
 	paths {
-		grammar: "examples\\textx\\textx.tx"
-		outline: "examples\\textx\\textx.txol"
-		coloring: "examples\\textx\\textx.txcl"
-	}
-
-	python {
-	    interpreter: "C:\\Users\\Nemanja\\AppData\\Local\\Programs\\Python\\Python36-32\\python.exe"
+		grammar: "textx/textx.tx"
+		outline: "textx/textx.txol"
+		coloring: "textx/textx.txcl"
 	}
 }

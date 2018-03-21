@@ -1,18 +1,8 @@
 dsl robot [rbt] {
-	general {
-		publisher: "FTN"
-		author: "Nemanja Starcev"
-        url: "http:\\github.com"
-		version: "1.0.0"
-    }
 
 	paths {
-		grammar: "examples\\robot\\robot.tx"
-		outline: "examples\\robot\\robot.txol"
-		coloring: "examples\\robot\\robot.txcl"
-	}
-
-	python {
-	    interpreter: "C:\\Users\\Nemanja\\AppData\\Local\\Programs\\Python\\Python36-32\\python.exe"
+		grammar: "robot/robot.tx"
+		outline: "robot/robot.txol"
+		coloring: "robot/robot.txcl"
 	}
 }
