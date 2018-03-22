@@ -5,30 +5,30 @@ Workflow {
 
 Init {
 	label = init
-	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\init.png"
+	icon = "icons/init.png"
 }
 
 Task {
 	label = name
-	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\task.png"
+	icon = "icons/task.png"
 }
 
 Entry {
 	label = entry
-	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\entry.png"
+	icon = "icons/entry.png"
 }
 
 Leave {
 	label = leave
-	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\leave.png"
+	icon = "icons/leave.png"
 }
 
 Next {
 	label = next
-	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\next.png"
+	icon = "icons/next.png"
 }
 
 Action {
 	label = name
-	icon = "D:\FAX\MASTER\TEXTX-TOOLS\textX-languageserver\examples\workflow\icons\action.png"
+	icon = "icons/action.png"
 }

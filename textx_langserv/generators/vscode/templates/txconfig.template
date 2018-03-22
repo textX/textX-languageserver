@@ -1,0 +1,15 @@
+dsl {{name}}{{extensions | replace("'", '')}} {
+	general {
+		publisher: "{{publisher}}"
+		author: "{{name}}"
+		url: "{{url}}"
+		version: "{{version}}"
+	}
+	paths {
+		grammar: "{{grammar_path}}"
+		outline: "{{outline_path}}"
+		coloring: "{{coloring_path}}"
+		classes: "{{classes_path}}"
+		builtins: "{{builtins_path}}"
+	}
+}

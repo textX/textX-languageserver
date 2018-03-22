@@ -9,8 +9,8 @@ GeneralSection:
 	'general' '{'
 		('publisher'   ':'	publisher=STRING)?
 		('author' 	   ':'	author=STRING)?
-		('repo_type'   ':'  repo_type=STRING)?
-		('repo_url'    ':'	repo_url=STRING)?
+		('repository'  ':'  repo_type=STRING)?
+		('url'   	   ':'	repo_url=STRING)?
 		('version' 	   ':'	version=STRING)?
 		('description' ':'	description=STRING)?
 	'}'
