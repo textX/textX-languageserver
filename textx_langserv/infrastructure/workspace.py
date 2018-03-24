@@ -1,3 +1,5 @@
+# Copyright 2017 Palantir Technologies, Inc.
+# Added TextXDocument class
 import io
 import logging
 import os
