@@ -104,3 +104,6 @@ ENV/
 third_party
 *.dot
 *.idea
+
+# Textx configration
+txconfig/

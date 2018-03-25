@@ -1,4 +1,4 @@
-from textx_langserv.infrastructure import lsp
+from ..infrastructure import lsp
 
 
 def get_capabilities(cmd_list):

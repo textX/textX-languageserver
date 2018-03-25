@@ -18,9 +18,15 @@ It implements [Language Server Protocol](https://github.com/Microsoft/language-s
 ## Building and running localy
 
 1. Make sure you have python 3.4+ installed on your machine.
-2. In projects root, create directory named 'third_party'
-3. Download [thid_party](https://drive.google.com/drive/folders/1ct5F9NNclUojbH4xPVC4yZPsrtSa18Nq) libraries and place them in directory from step 2.
-4. `python __main__.py --tcp`
+2. Create and activate virtual environment
+3. Install server with `pip install textxls`
+4. `pip uninstall textx`
+5. `pip install https://github.com/igordejanovic/textx/archive/master.zip`
+6. Run server `textxls --tcp`
+
+NOTE:
+
+Steps 4. and 5. are required because new version of textX is not yet published on pypi.
 
 ## Language server features
 

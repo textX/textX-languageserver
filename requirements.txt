@@ -5,5 +5,5 @@ jsonrpcserver==3.5.1
 jsonschema==2.6.0
 MarkupSafe==1.0
 six==1.11.0
-git+https://github.com/textX-tools/textX.git#egg=textX
+git+https://github.com/igordejanovic/textX.git#egg=textX
 websockets==3.4

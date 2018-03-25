@@ -1,4 +1,4 @@
-from textx_langserv.utils._utils import pos_to_line_col
+from ..utils._utils import pos_to_line_col
 
 REFERENCE_TEXT_LENS = "{0} references"
 

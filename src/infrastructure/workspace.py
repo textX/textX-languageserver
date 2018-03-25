@@ -7,8 +7,8 @@ import re
 import sys
 import itertools
 
-from textx_langserv.infrastructure import lsp
-from textx_langserv.utils import uris, _utils
+from ..infrastructure import lsp
+from ..utils import uris, _utils
 
 from textx.exceptions import TextXSemanticError, TextXSyntaxError
 

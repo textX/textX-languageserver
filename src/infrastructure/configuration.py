@@ -8,14 +8,14 @@ from os.path import join, dirname
 
 from textx.metamodel import metamodel_from_file
 
-from textx_langserv.utils import uris
-from textx_langserv.utils._utils import flatten
-from textx_langserv.utils.constants import TX_TX_EXTENSION,\
+from ..utils import uris
+from ..utils._utils import flatten
+from ..utils.constants import TX_TX_EXTENSION,\
     TX_CONFIG_EXTENSION, TX_OUTLINE_EXTENSION, TX_COLORING_EXTENSION, \
     TX_MM, CONFIG_MM, COLORING_MM, OUTLINE_MM, \
     MM_PATH
 
-from textx_langserv import LS_ROOT_PATH
+from .. import LS_ROOT_PATH
 
 __author__ = "Daniel Elero"
 __copyright__ = "textX-tools"

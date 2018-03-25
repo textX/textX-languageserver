@@ -4,26 +4,26 @@ import os
 
 from os.path import join
 
-from textx_langserv.utils.constants import SERVER_TYPE, SERVER_CONNECTION,\
+from ..utils.constants import SERVER_TYPE, SERVER_CONNECTION,\
     SERVER_GENERAL, SERVER_PIPES, SERVER_TCP
-from textx_langserv.utils import _utils, uris
+from ..utils import _utils, uris
 
-from textx_langserv.infrastructure.language_server import LanguageServer
-from textx_langserv.infrastructure.workspace import Workspace
-from textx_langserv.infrastructure.configuration import Configuration
-from textx_langserv.infrastructure.lsp import MessageType
+from ..infrastructure.language_server import LanguageServer
+from ..infrastructure.workspace import Workspace
+from ..infrastructure.configuration import Configuration
+from ..infrastructure.lsp import MessageType
 
-from textx_langserv.capabilities import get_capabilities
-from textx_langserv.capabilities.completions import completions
-from textx_langserv.capabilities.lint import lint
-from textx_langserv.capabilities.hover import hover
-from textx_langserv.capabilities.definitions import definitions
-from textx_langserv.capabilities.find_references import find_all_references
-from textx_langserv.capabilities.code_lens import code_lens
+from ..capabilities import get_capabilities
+from ..capabilities.completions import completions
+from ..capabilities.lint import lint
+from ..capabilities.hover import hover
+from ..capabilities.definitions import definitions
+from ..capabilities.find_references import find_all_references
+from ..capabilities.code_lens import code_lens
 
-from textx_langserv.commands import get_commands
+from ..commands import get_commands
 
-from textx_langserv import LS_ROOT_PATH
+from .. import LS_ROOT_PATH
 
 __author__ = "Daniel Elero"
 __copyright__ = "textX-tools"

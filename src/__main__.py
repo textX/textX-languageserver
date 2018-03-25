@@ -5,18 +5,6 @@ import argparse
 import json
 
 
-def change_environment():
-    site_packs = [p for p in sys.path if 'site-packages' in p]
-    for sp in site_packs:
-        sys.path.remove(sp)
-    sys.path.insert(0, os.path.abspath(os.path.join(__file__,
-                                                    '../third_party')))
-
-change_environment()
-
-from textx_langserv.infrastructure import language_server
-from textx_langserv.infrastructure.textx_ls import TextXLanguageServer
-
 LOG_FORMAT = "%(asctime)s UTC - %(levelname)s - %(name)s - %(message)s"
 
 
@@ -73,13 +61,36 @@ def main():
     elif args.verbose >= 2:
         level = logging.DEBUG
     logging.getLogger().setLevel(level)
+
     if args.tcp:
-        language_server.start_tcp_lang_server(args.host, args.port,
-                                              TextXLanguageServer)
+        run_tcp(args)
     else:
-        stdin, stdout = _binary_stdio()
-        language_server.start_io_lang_server(stdin, stdout,
-                                             TextXLanguageServer)
+        run()
+
+
+def run():
+    """
+    For publishing with vscode extension
+    """
+    change_environment()
+    from src.infrastructure import language_server
+    from src.infrastructure.textx_ls import TextXLanguageServer
+
+    stdin, stdout = _binary_stdio()
+    language_server.start_io_lang_server(stdin, stdout,
+                                         TextXLanguageServer)
+
+
+def run_tcp(args):
+    """
+    For development and debugging
+    """
+    from src.infrastructure import language_server
+    from src.infrastructure.textx_ls import TextXLanguageServer
+
+    print("Server started on {}:{}".format(args.host, args.port))
+    language_server.start_tcp_lang_server(args.host, args.port,
+                                          TextXLanguageServer)
 
 
 def _binary_stdio():
@@ -103,6 +114,16 @@ def _binary_stdio():
         stdin, stdout = sys.stdin, sys.stdout
 
     return stdin, stdout
+
+
+def change_environment():
+    site_packs = [p for p in sys.path if 'site-packages' in p]
+    for sp in site_packs:
+        sys.path.remove(sp)
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))
+    sys.path.insert(0, os.path.abspath(os.path.join(__file__,
+                                                    '../../third_party')))
 
 
 if __name__ == "__main__":

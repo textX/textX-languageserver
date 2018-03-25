@@ -5,22 +5,22 @@ import sys
 import codecs
 from setuptools import setup, find_packages
 
-NAME = 'textXLanguageServer'
+NAME = 'textXls'
 DESC = 'Language server for DSLs created with textX'
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 AUTHOR = 'Daniel Elero'
-AUTHOR_EMAIL = 'danixeee AT gmail DOT com'
+AUTHOR_EMAIL = 'danixeee@gmail.com'
 LICENSE = 'MIT'
 URL = 'https://github.com/textX-tools/textX-languageserver'
-README = ''
-# README = codecs.open(os.path.join(os.path.dirname(__file__), 'README.rst'),
-#                      'r', encoding='utf-8').read()
+README = codecs.open(os.path.join(os.path.dirname(__file__), 'README.md'),
+                     'r', encoding='utf-8').read()
 
 setup(
     name=NAME,
     version=VERSION,
     description=DESC,
     long_description=README,
+    long_description_content_type='text/markdown',
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     maintainer=AUTHOR,
@@ -28,7 +28,7 @@ setup(
     license=LICENSE,
     url=URL,
     packages=find_packages(),
-    package_data={'textx_langserv.metamodel': ['*tx']},
+    package_data={'src.metamodel': ['*tx']},
     install_requires=[
         'funcsigs==1.0.2',
         'Jinja2==2.9.6',
@@ -42,13 +42,22 @@ setup(
         'textX'
     ],
     dependency_links=[
-        'https://github.com/textX-tools/textX/tarball/pull_request#egg=textX'
+        'git+https://github.com/igordejanovic/textX.git@master#egg=textX'
     ],
-    keywords="textx vscode extension",
+    keywords="textx language server protocol LSP DSL",
     entry_points={
         'console_scripts': [
-            'textxls = textx_langserv.__main__:main'
+            'textxls = src.__main__:main'
         ]
-    }
-
+    },
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: Science/Research',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3 :: Only',
+    ]
 )

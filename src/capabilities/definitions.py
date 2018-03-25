@@ -3,7 +3,7 @@ This module is responsible for go to definition feature.
 """
 import bisect
 
-from textx_langserv.utils import _utils
+from ..utils import _utils
 
 __author__ = "Daniel Elero"
 __copyright__ = "textX-tools"

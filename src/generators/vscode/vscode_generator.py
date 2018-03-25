@@ -15,12 +15,12 @@ from distutils.dir_util import copy_tree
 from shutil import copy2
 from jinja2 import Environment, FileSystemLoader
 
-from textx_langserv.utils.uris import to_fs_path
+from ...utils.uris import to_fs_path
 
-from textx_langserv import EXTENSION_ROOT_PATH
-from textx_langserv.utils.constants import SERVER_TCP
+from ... import EXTENSION_ROOT_PATH
+from ...utils.constants import SERVER_TCP
 
-from textx_langserv.generators.vscode.coloring import ColoringVSCode
+from ...generators.vscode.coloring import ColoringVSCode
 
 this_folder = dirname(__file__)
 
@@ -54,7 +54,7 @@ def generate(textx_ls, args):
 
         # Copy .txconfig
         gen_config_path = join(gen_path,
-                               'textX-languageserver/textx_langserv/txconfig')
+                               'textX-languageserver/src/txconfig')
         cfg = copy_configs(textx_ls.configuration, gen_config_path, env)
 
         # Copy outline icons
@@ -78,7 +78,7 @@ def generate(textx_ls, args):
 
 def make_gen_dirs(gen_path):
     path = join(gen_path,
-                'textX-languageserver/textx_langserv/txconfig/icons')
+                'textX-languageserver/src/txconfig/icons')
 
     if not os.path.exists(path):
         os.makedirs(path)

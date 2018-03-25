@@ -5,8 +5,8 @@ outline tree data.
 import os
 from os.path import join, dirname
 
-from textx_langserv.utils._utils import pos_to_line_col
-from textx_langserv.utils.uris import to_abs_path
+from ..utils._utils import pos_to_line_col
+from ..utils.uris import to_abs_path
 from json import JSONEncoder
 
 __author__ = "Nemanja Starčev"

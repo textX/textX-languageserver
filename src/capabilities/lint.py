@@ -1,8 +1,8 @@
 """
 This module is responsible for linting document file.
 """
-from textx_langserv.utils import _utils
-from textx_langserv.infrastructure.lsp import Diagnostic
+from ..utils import _utils
+from ..infrastructure.lsp import Diagnostic
 
 __author__ = "Daniel Elero"
 __copyright__ = "textX-tools"

@@ -4,8 +4,8 @@ from textx.exceptions import TextXSemanticError, TextXSyntaxError
 from textx.const import MULT_ASSIGN_ERROR, UNKNOWN_OBJ_ERROR
 from textx.lang import BASE_TYPE_RULES
 
-from textx_langserv.utils import _utils
-from textx_langserv.infrastructure.lsp import Completions, CompletionItemKind
+from ..utils import _utils
+from ..infrastructure.lsp import Completions, CompletionItemKind
 
 __author__ = "Daniel Elero"
 __copyright__ = "textX-tools"

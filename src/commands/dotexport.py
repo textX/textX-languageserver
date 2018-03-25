@@ -3,7 +3,7 @@ import uuid
 from os.path import join, basename, splitext
 from textx import metamodel_from_file
 from textx.export import metamodel_export, model_export
-from textx_langserv.utils.uris import to_fs_path
+from ..utils.uris import to_fs_path
 
 
 def dotexport_metamodel_cmd(textx_ls, args):

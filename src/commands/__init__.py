@@ -1,11 +1,11 @@
-from textx_langserv.utils.constants import TX_OUTLINE_COMMAND, \
+from src.utils.constants import TX_OUTLINE_COMMAND, \
     TX_METAMODEL_EXPORT_COMMAND, TX_MODEL_EXPORT_COMMAND, \
     TX_VSCODE_GENEXT_COMMAND
 
-from textx_langserv.commands.outline import OutlineTree
-from textx_langserv.commands.dotexport import dotexport_metamodel_cmd, \
+from .outline import OutlineTree
+from .dotexport import dotexport_metamodel_cmd, \
     dotexport_model_cmd
-from textx_langserv.generators.vscode import vscode_generator
+from ..generators.vscode import vscode_generator
 
 from threading import Thread
 

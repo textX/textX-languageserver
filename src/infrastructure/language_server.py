@@ -1,6 +1,6 @@
 # Copyright 2017 Palantir Technologies, Inc.
-from textx_langserv.utils import uris
-from textx_langserv.infrastructure.server import JSONRPCServer
+from ..utils import uris
+from ..infrastructure.server import JSONRPCServer
 
 import logging
 import re
