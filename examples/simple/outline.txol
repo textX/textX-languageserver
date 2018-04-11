@@ -1,0 +1,9 @@
+Program {
+    label = name
+    icon = ''
+}
+
+Class {
+    label = name
+    icon = ''
+}

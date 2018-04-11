@@ -1,4 +1,9 @@
 dsl robot [rbt] {
+	
+	general {
+		publisher: "test"
+		version: "0.0.1"
+	}
 
 	paths {
 		grammar: "robot/robot.tx"

@@ -1,0 +1,13 @@
+dsl Workflow [wf] {
+
+	general {
+		publisher: "test"
+		version: "0.0.1"
+	}
+
+	paths {
+		grammar: "workflow/workflow.tx"
+		outline: "workflow/workflow.txol"
+		coloring: "workflow/workflow.txcl"
+	}
+}

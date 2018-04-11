@@ -1,0 +1,40 @@
+program MyProgram
+{
+    public class First
+    {
+        public Second Print()
+        {
+
+        }
+
+        public Second Scan()
+        {
+
+        }
+
+        public First Test() {
+        
+        }
+
+        public int X(){
+            
+        }
+    }
+    public class Second
+    {
+        public Second Read()
+        {
+            First first = new First();
+            first.Scan();
+        }
+
+        public First Write()
+        {
+            
+        }
+    }
+
+    public class Third {
+        
+    }
+}

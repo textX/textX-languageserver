@@ -1,4 +1,4 @@
-dsl Workflow [wf] {
+dsl Simple [smpl] {
 
 	general {
 		publisher: "test"
@@ -6,8 +6,9 @@ dsl Workflow [wf] {
 	}
 
 	paths {
-		grammar: "workflow/workflow.tx"
-		outline: "workflow/workflow.txol"
-		coloring: "workflow/workflow.txcl"
+		grammar: "simple/simple.tx"
+		outline: "simple/outline.txol"
+		classes: "simple/lang.py:get_classes"
+		builtins: "simple/lang.py:get_builtins"
 	}
 }

@@ -1,0 +1,48 @@
+Program:
+    'program' name=ID
+    '{'
+        classes*=Class
+    '}'
+;
+
+Class:
+    modifier=Modifier? 'class' name=ID
+    '{'
+        methods*=Method
+    '}'
+;
+
+Method:
+    modifier=Modifier? retVal=[Type] name=ID '('')'
+    '{'
+        body=MethodBody
+    '}'
+;
+
+MethodBody:
+    statements*=Statement
+;
+
+Statement:
+    InitStatement | MethodCallStatement
+;
+
+InitStatement:
+    var_type=[Type] var_name=ID '=' 'new' var_type_ctor=[Type] '('')' ';'
+;
+
+MethodCallStatement:
+    var_name=ID '.' method=[Method] '(' ')' ';'
+;
+
+Modifier:
+    "public" | "private"
+;
+
+Type:
+    SimpleType | Class
+;
+
+SimpleType:
+   'type' name=ID
+;
