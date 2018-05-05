@@ -2,6 +2,7 @@
 import os
 import functools
 import threading
+import imp
 
 
 def debounce(interval_s):
@@ -15,6 +16,16 @@ def debounce(interval_s):
             debounced._timer.start()
         return debounced
     return wrapper
+
+
+def exec_func_from_module(path_to_module, module_name):
+    try:
+        func_name = path_to_module[2:].split(':')[1]
+        path_name = path_to_module.replace(':{}'.format(func_name), '')
+        module = imp.load_source(module_name, path_name)
+        return getattr(module, func_name)()
+    except:
+        return None
 
 
 def flatten(list_of_lists):
@@ -37,7 +48,7 @@ def line_col_to_pos(source, position):
 def pos_to_line_col(source, pos):
     line = 0
     lines = source.splitlines()
-    for l in lines:
+    for _ in lines:
         temp = pos - (len(lines[line]) + 2)
         if temp >= 0:
             pos = temp

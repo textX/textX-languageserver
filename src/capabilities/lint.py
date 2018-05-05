@@ -25,6 +25,10 @@ def lint(doc_uri, workspace):
             try:
                 msg = e.args[0].decode("utf-8")
                 msg = msg.split(' at')[0]
+                if e.offset:
+                    line, col = _utils.pos_to_line_col(txdoc.source, e.offset)
+                    e.line = line
+                    e.col = col
                 diagnostic.error(txdoc.lines, e.line, e.col, msg)
             except:
                 diagnostic.error(txdoc.lines, e.line, e.col, str(e))

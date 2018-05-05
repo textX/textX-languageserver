@@ -73,10 +73,12 @@ class Diagnostic(object):
 
     def error(self, lines, line, col, message,
               severity=None, code=None, source=None):
+        line = line or 1
+        col = col or 1
         range = {
-                    'start': {'line': line-1, 'col': col},
-                    'end': {'line': line-1, 'col': col+len(lines[line-1])}
-                }
+            'start': {'line': line-1, 'col': col},
+            'end': {'line': line-1, 'col': col+len(lines[line-1])}
+        }
         self.diagnostics.append({
             'range': range,
             'message': message,

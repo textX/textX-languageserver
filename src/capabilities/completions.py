@@ -64,7 +64,6 @@ def completions(doc_uri, workspace, position):
     def get_sem_err_com_items(semantic_errors):
         items = []
         if len(semantic_errors) > 0:
-            print('sem')
             for e in semantic_errors:
                 if e.err_type == UNKNOWN_OBJ_ERROR:
                     # If type of error is UNKNOWN_OBJ_ERROR
@@ -98,9 +97,9 @@ def completions(doc_uri, workspace, position):
         cls_names.extend(_get_parent_classes(cls))
         instances = []
         instances.extend([obj.name
-                         for obj in txdoc.get_all_rule_instances()
-                         if hasattr(obj, 'name') and
-                         type(obj).__name__ in cls_names])
+                          for obj in txdoc.get_all_rule_instances()
+                          if hasattr(obj, 'name') and
+                          type(obj).__name__ in cls_names])
         return instances
 
     for i in get_syn_err_com_items(syntax_errors):

@@ -9,7 +9,7 @@ from os.path import join, dirname
 from textx.metamodel import metamodel_from_file
 
 from ..utils import uris
-from ..utils._utils import flatten
+from ..utils._utils import flatten, exec_func_from_module
 from ..utils.constants import TX_TX_EXTENSION,\
     TX_CONFIG_EXTENSION, TX_OUTLINE_EXTENSION, TX_COLORING_EXTENSION, \
     TX_MM, CONFIG_MM, COLORING_MM, OUTLINE_MM, \
@@ -29,7 +29,8 @@ class Configuration(object):
         self.txconfig_uri = join(root_uri, TX_CONFIG_EXTENSION)
         self.config_model = None
 
-        self._loader = lambda path, classes=[], builtins={}: \
+        self._loader = \
+            lambda path, classes=[], builtins={}, match_filters={}: \
             metamodel_from_file(join(LS_ROOT_PATH,
                                      MM_PATH,
                                      path),
@@ -62,30 +63,40 @@ class Configuration(object):
                 return mm_loader
 
     def get_mm_by_ext(self, ext):
-        return self._get_mm_loader_by_ext(ext)()
+        mm = self._get_mm_loader_by_ext(ext)()
+        # Assign object and model processors
+        if self.config_model is not None \
+                and ext in self.language_extensions:
+
+            if self.object_processors_path:
+                obj_proc = exec_func_from_module(self.object_processors_path,
+                                                 "_object_processors")
+                if obj_proc is not None:
+                    mm.register_obj_processors(obj_proc)
+            if self.model_processors_path:
+                model_proc = exec_func_from_module(self.model_processors_path,
+                                                   "_model_processors")
+                if model_proc is not None:
+                    for mp in model_proc:
+                        mm.register_model_processor(mp)
+
+        return mm
 
     def load_metamodel(self):
-        def exec_func_from_module_path(path, module_name):
-            import imp
-            try:
-                func_name = path[2:].split(':')[1]
-                path_name = path.replace(':{}'.format(func_name), '')
-                module = imp.load_source(module_name, path_name)
-                return getattr(module, func_name)()
-            except:
-                return None
-
-        classes = exec_func_from_module_path(self.classes_path,
-                                             "_custom_classes")
-        builtins = exec_func_from_module_path(self.builtins_path,
-                                              "_custom_builtins")
+        classes = exec_func_from_module(self.classes_path,
+                                        "_custom_classes")
+        builtins = exec_func_from_module(self.builtins_path,
+                                         "_custom_builtins")
+        match_filters = exec_func_from_module(self.match_filters_path,
+                                              "match_filters")
 
         self.reset_languages_list()
         self.languages.append((self.language_extensions,
                                partial(self._loader,
                                        self.grammar_path,
                                        classes,
-                                       builtins)))
+                                       builtins,
+                                       match_filters)))
 
     def reset_languages_list(self):
         if len(self.languages) > self.builtin_lang_len:
@@ -177,6 +188,21 @@ class Configuration(object):
     @property
     def builtins_path(self):
         path = self.config_model.paths_section.builtins_path
+        return uris.to_abs_path(self.root_uri, path)
+
+    @property
+    def model_processors_path(self):
+        path = self.config_model.paths_section.model_processors_path
+        return uris.to_abs_path(self.root_uri, path)
+
+    @property
+    def object_processors_path(self):
+        path = self.config_model.paths_section.object_processors_path
+        return uris.to_abs_path(self.root_uri, path)
+
+    @property
+    def match_filters_path(self):
+        path = self.config_model.paths_section.match_filters_path
         return uris.to_abs_path(self.root_uri, path)
 
     @property

@@ -18,12 +18,15 @@ GeneralSection:
 
 PathsSection:
 	'paths' '{'
-		'grammar'	':'	grammar_path=STRING
-		('outline'	':' outline_path=STRING)?
-		('coloring'	':'	coloring_path=STRING)?
-		('classes'	':' classes_path=STRING)?
-		('builtins'	':' builtins_path=STRING)?
-		('generate' ':' generate_path=STRING)?
+		'grammar'				':'	grammar_path=STRING
+		('outline'				':' outline_path=STRING)?
+		('coloring'				':'	coloring_path=STRING)?
+		('classes'				':' classes_path=STRING)?
+		('builtins'				':' builtins_path=STRING)?
+		('model_processors'		':' model_processors_path=STRING)?
+		('object_processors'	':' object_processors_path=STRING)?
+		('match_filters'		':' match_filters_path=STRING)?
+		('generate' 			':' generate_path=STRING)?
 	'}'
 ;
 
