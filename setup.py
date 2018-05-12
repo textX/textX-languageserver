@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 NAME = 'textXls'
 DESC = 'Language server for DSLs created with textX'
-VERSION = '1.0.1'
+VERSION = '1.1.0'
 AUTHOR = 'Daniel Elero'
 AUTHOR_EMAIL = 'danixeee@gmail.com'
 LICENSE = 'MIT'
