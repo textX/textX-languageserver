@@ -1,5 +1,7 @@
 # textX language server
 
+**NOTE:** This project is deprecated. It is superseded by [textX-LS](https://github.com/textX/textX-LS).
+
 This is an language server (LS) with [textX](https://github.com/textX/textX) integration written entirely in python.
 It implements [Language Server Protocol](https://github.com/Microsoft/language-server-protocol).
 
