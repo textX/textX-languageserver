@@ -31,7 +31,7 @@ setup(
     package_data={'src.metamodel': ['*tx']},
     install_requires=[
         'funcsigs==1.0.2',
-        'Jinja2==2.9.6',
+        'Jinja2==2.11.3',
         'json-rpc==1.10.3',
         'jsonrpcserver==3.5.1',
         'jsonschema==2.6.0',
