@@ -6,4 +6,4 @@ jsonschema==2.6.0
 MarkupSafe==1.0
 six==1.11.0
 git+https://github.com/igordejanovic/textX.git#egg=textX
-websockets==3.4
+websockets==9.1
