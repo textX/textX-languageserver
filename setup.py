@@ -37,7 +37,7 @@ setup(
         'jsonschema==2.6.0',
         'MarkupSafe==1.0',
         'six==1.11.0',
-        'websockets==3.4',
+        'websockets==9.1',
         'Arpeggio==1.7',
         'textX'
     ],
